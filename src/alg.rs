@@ -1,8 +1,9 @@
-pub fn encrypt() {
+pub fn encrypt(input: String, key: String) -> Result<Vec<u8>, ()> {
 
+    todo!();
 }
 
-pub fn decrypt() {
+pub fn decrypt(input: Vec<u8>, key: String) -> Result<String, ()> {
 
+    todo!();
 }
-

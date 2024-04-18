@@ -7,19 +7,19 @@ pub struct Cryptstream {
 impl Cryptstream {
     pub fn open_cryptstream(path: String, passphrase: String) -> Result<Cryptstream, ()> {
         
-        todo!(); // Decrypt and read data
+        todo!("Opening cryptstream not implemented yet");
     }
     pub fn close_cryptstream(&mut self) {
 
-        todo!(); // Close and secure memory
+        todo!("Closing cryptstream not implemented yet");
     }
     pub fn write(&mut self, data: String) {
 
-        todo!(); // Write data to memory
+        todo!("Writing to cryptstream not implemented yet");
     }
     pub fn flush(&mut self) -> Result<(),()> {
 
-        todo!(); // Write encrypted data to disk
+        todo!("Flushing cryptstream not implemented yet");
     }
 }
 

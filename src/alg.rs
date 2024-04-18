@@ -1,11 +1,11 @@
 pub fn encrypt(input: String, key: String) -> Result<Vec<u8>, ()> {
 
-    todo!();
+    todo!("Encrypting isn't implemented yet");
 }
 
 pub fn decrypt(input: Vec<u8>, key: String) -> Result<String, ()> {
 
-    todo!();
+    todo!("Decrypting isn't implemented yet");
 }
 
 fn quarter_round(a: &mut u32, b: &mut u32, c: &mut u32, d: &mut u32) {
@@ -28,6 +28,8 @@ fn quarter_round(a: &mut u32, b: &mut u32, c: &mut u32, d: &mut u32) {
     *c += *d;
     *b ^= *c;
     *b <<= 7;
+
+    todo!("Operations aren't wrapped yet");
 }
 
 #[cfg(test)]

@@ -1,5 +1,7 @@
 pub struct Cryptstream {
-    path: String,
+    path: String, // Path to file
+    data: Vec<u8>, // Data buffer
+    open: bool, // File open or closed
 }
 
 impl Cryptstream {
@@ -11,11 +13,11 @@ impl Cryptstream {
 
         todo!(); // Close and secure memory
     }
-    pub fn write(data: String) {
+    pub fn write(&mut self, data: String) {
 
         todo!(); // Write data to memory
     }
-    pub fn flush() -> Result<(),()> {
+    pub fn flush(&mut self) -> Result<(),()> {
 
         todo!(); // Write encrypted data to disk
     }

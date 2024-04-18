@@ -10,6 +10,8 @@ cryptstream.write("Hello, world!");
 cryptstream.close_cryptstream();
 ```
 
-## Licensing
-This code is licensed under the MIT license, and as always users are more than welcome to submit bug reports or pull requests.
+## Contributing
+This code is licensed under the MIT license, and as always users are more than welcome to submit bug reports or pull requests. Do *not* submit code that fails one or more tests!
 
+## References
+This library was designed according to the specifications described in [RFC 7539](https://datatracker.ietf.org/doc/html/rfc7539) as well as [RFC 8439](https://datatracker.ietf.org/doc/html/rfc8439).

@@ -1,6 +1,6 @@
-pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3]) -> Result<Vec<u8>, ()> {
+pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3], block: u32) -> Result<Vec<u8>, ()> {
     // Get an initialized ChaCha20 state
-    let init_state = init_state(key, nonce);
+    let init_state = init_state(key, nonce, block);
     let mut working_state = init_state;
 
     // Perform hashing
@@ -25,7 +25,7 @@ pub fn decrypt(input: Vec<u8>, key: String) -> Result<String, ()> {
     todo!("Decrypting isn't implemented yet");
 }
 
-fn init_state(key: [u32; 8], nonce: [u32; 3]) -> [u32; 16] {
+fn init_state(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u32; 16] {
     // Declare matrix (initialization isn't important, it will be overwritten anyways)
     let mut state: [u32; 16] = [0; 16];
 
@@ -47,8 +47,8 @@ fn init_state(key: [u32; 8], nonce: [u32; 3]) -> [u32; 16] {
     state[10] = key[6];
     state[11] = key[7];
 
-    // Forth row: Block count (0), and nonce
-    state[12] = 0;
+    // Forth row: Block count and nonce
+    state[12] = block;
     state[13] = nonce[0];
     state[14] = nonce[1];
     state[15] = nonce[2];
@@ -123,6 +123,16 @@ mod tests {
             state,
             [0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         );
+    }
+
+    #[test]
+    fn init_state_1() {
+        // Test that the state initializes correctly
+        let state = init_state([0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c], [0x09000000, 0x4a000000, 0x00000000], 1);
+        assert_eq!(
+            state,
+            [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574, 0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c, 0x00000001,  0x09000000, 0x4a000000,  0x00000000]
+            );
     }
 }
 

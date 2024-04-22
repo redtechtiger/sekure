@@ -1,9 +1,13 @@
 pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3], block: u32) -> Result<Vec<u8>, ()> {
-    // Get an initialized ChaCha20 state
+    todo!("Encrypting isn't implemented yet");
+}
+
+pub fn block(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u8; 64] {
+    // Get initial state
     let init_state = init_state(key, nonce, block);
     let mut working_state = init_state;
 
-    // Perform hashing
+    // Execute rounds
     for i in 0..11 {
         quarter_round(&mut working_state, 0, 4, 8, 12);
         quarter_round(&mut working_state, 1, 5, 9, 13);
@@ -17,8 +21,11 @@ pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3], block: u32) -> Res
     let final_state = add_states(init_state, working_state);
 
     // Serialize
-
-    todo!("Encrypting isn't implemented yet");
+    let mut serialized: [u8; 64] = [0; 64];
+    for i in 0..16 {
+        serialized[4*i..][..4].copy_from_slice(&working_state[i].to_le_bytes());
+    }
+    serialized
 }
 
 pub fn decrypt(input: Vec<u8>, key: String) -> Result<String, ()> {
@@ -143,6 +150,11 @@ mod tests {
             add_states(state1, state2),
             [0xe4e7f110, 0x15593bd1, 0x1fdd0f50, 0xc47120a3, 0xc7f4d1c7, 0x0368c033, 0x9aaa2204, 0x4e6cd4c3, 0x466482d2, 0x09aa9f07, 0x05d7c214, 0xa2028bd9, 0xd19c12b5, 0xb94e16de, 0xe883d0cb, 0x4e3c50a2]
             );
+    }
+
+    #[test]
+    fn block_1() {
+
     }
 
 }

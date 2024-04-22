@@ -1,6 +1,10 @@
 pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3]) -> Result<Vec<u8>, ()> {
     // Get an initialized ChaCha20 state
     let mut state = init_state(key, nonce);
+
+    for i in 0..11 {
+        quarter_round(&mut state, 0, 4, 8, 12);
+    }
     
     todo!("Encrypting isn't implemented yet");
 }
@@ -41,26 +45,26 @@ fn init_state(key: [u32; 8], nonce: [u32; 3]) -> [u32; 16] {
     state
 }
 
-fn quarter_round(a: &mut u32, b: &mut u32, c: &mut u32, d: &mut u32) {
+fn quarter_round(state: &mut [u32; 8], a: usize, b: usize, c: usize, d: usize) {
     // Stage 1
-    *a = a.wrapping_add(*b);
-    *d ^= *a;
-    *d = d.rotate_left(16);
+    state[a] = state[a].wrapping_add(state[b]);
+    state[d] ^= state[a];
+    state[d] = state[d].rotate_left(16);
 
     // Stage 2
-    *c = c.wrapping_add(*d);
-    *b ^= *c;
-    *b = b.rotate_left(12);
+    state[c] = state[c].wrapping_add(state[d]);
+    state[b] ^= state[c];
+    state[b] = state[b].rotate_left(12);
 
     // Stage 3
-    *a = a.wrapping_add(*b);
-    *d ^= *a;
-    *d = d.rotate_left(8);
+    state[a] = state[a].wrapping_add(state[b]);
+    state[d] ^= state[a];
+    state[d] = state[d].rotate_left(8);
 
     // Stage 4
-    *c = c.wrapping_add(*d);
-    *b ^= *c;
-    *b = b.rotate_left(7);
+    state[c] = state[c].wrapping_add(state[d]);
+    state[b] ^= state[c];
+    state[b] = state[b].rotate_left(7);
 }
 
 #[cfg(test)]
@@ -76,7 +80,7 @@ mod tests {
 
     #[test]
     fn quarter_round_1() { // Test that the quarter round produces correct results (2.2.1)
-        let (mut a, mut b, mut c, mut d) = (0x516461b1, 0x2a5f714c, 0x53372767, 0x3d631689);
+        let mut state = [0x516461b1, 0x2a5f714c, 0x53372767, 0x3d631689, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         quarter_round(&mut a, &mut b, &mut c, &mut d);
         assert_eq!(
             (a, b, c, d),

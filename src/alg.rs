@@ -45,7 +45,7 @@ fn init_state(key: [u32; 8], nonce: [u32; 3]) -> [u32; 16] {
     state
 }
 
-fn quarter_round(state: &mut [u32; 8], a: usize, b: usize, c: usize, d: usize) {
+fn quarter_round(state: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize) {
     // Stage 1
     state[a] = state[a].wrapping_add(state[b]);
     state[d] ^= state[a];
@@ -80,21 +80,43 @@ mod tests {
 
     #[test]
     fn quarter_round_1() { // Test that the quarter round produces correct results (2.2.1)
-        let mut state = [0x516461b1, 0x2a5f714c, 0x53372767, 0x3d631689, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        quarter_round(&mut a, &mut b, &mut c, &mut d);
+        let mut state = [0x516461b1, 0x2a5f714c, 0x53372767, 0x3d631689,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0];
+        quarter_round(&mut state, 0, 1, 2, 3);
         assert_eq!(
-            (a, b, c, d),
-            (0xbdb886dc, 0xcfacafd2, 0xe46bea80, 0xccc07c79)
+            state,
+            [0xbdb886dc, 0xcfacafd2, 0xe46bea80, 0xccc07c79,
+             0, 0, 0, 0,
+             0, 0, 0, 0,
+             0, 0, 0, 0]
         );
     }
 
     #[test]
-    fn quarter_round_2() { // Test that the quarter round produces correct results (2.1.1)
-        let (mut a, mut b, mut c, mut d) = (0x11111111, 0x01020304, 0x9b8d6f43, 0x01234567);
-        quarter_round(&mut a, &mut  b, &mut c, &mut d);
+    fn quarter_round_2() { // Test that the quarter round produces correct results (2.2.1)
+        let mut state = [0x11111111, 0x01020304, 0x9b8d6f43, 0x01234567,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0,
+                         0, 0, 0, 0];
+        quarter_round(&mut state, 0, 1, 2, 3);
         assert_eq!(
-            (a, b, c, d),
-            (0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb)
+            state,
+            [0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb,
+             0, 0, 0, 0,
+             0, 0, 0, 0,
+             0, 0, 0, 0]
         );
     }
+
+    // #[test]
+    // fn quarter_round_2() { // Test that the quarter round produces correct results (2.1.1)
+    //     let (mut a, mut b, mut c, mut d) = (0x11111111, 0x01020304, 0x9b8d6f43, 0x01234567);
+    //     quarter_round(&mut a, &mut  b, &mut c, &mut d);
+    //     assert_eq!(
+    //         (a, b, c, d),
+    //         (0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb)
+    //     );
+    // }
 }

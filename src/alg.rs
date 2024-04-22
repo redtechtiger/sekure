@@ -1,10 +1,22 @@
 pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3]) -> Result<Vec<u8>, ()> {
     // Get an initialized ChaCha20 state
-    let mut state = init_state(key, nonce);
+    let init_state = init_state(key, nonce);
+    let mut working_state = init_state;
 
+    // Perform hashing
     for i in 0..11 {
-        quarter_round(&mut state, 0, 4, 8, 12);
+        quarter_round(&mut working_state, 0, 4, 8, 12);
+        quarter_round(&mut working_state, 1, 5, 9, 13);
+        quarter_round(&mut working_state, 2, 6, 10, 14);
+        quarter_round(&mut working_state, 3, 7, 11, 15);
+        quarter_round(&mut working_state, 0, 5, 10, 15);
+        quarter_round(&mut working_state, 1, 6, 11, 12);
+        quarter_round(&mut working_state, 2, 7, 8, 13);
+        quarter_round(&mut working_state, 3, 4, 9, 14);
     }
+    let final_state = add_states(init_state, working_state);
+
+    // Serialize
 
     todo!("Encrypting isn't implemented yet");
 }
@@ -66,6 +78,15 @@ fn quarter_round(state: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize) 
     state[b] = state[b].rotate_left(7);
 }
 
+fn add_states(state1: [u32; 16], state2: [u32; 16]) -> [u32; 16] {
+    // Calculate the sum of both matrices
+    let mut sum_state: [u32; 16] = [0; 16];
+    for i in 0..17 {
+        sum_state[i] = state1[i].wrapping_add(state2[i]);
+    }
+    sum_state
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -103,14 +124,5 @@ mod tests {
             [0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         );
     }
-
-    // #[test]
-    // fn quarter_round_2() { // Test that the quarter round produces correct results (2.1.1)
-    //     let (mut a, mut b, mut c, mut d) = (0x11111111, 0x01020304, 0x9b8d6f43, 0x01234567);
-    //     quarter_round(&mut a, &mut  b, &mut c, &mut d);
-    //     assert_eq!(
-    //         (a, b, c, d),
-    //         (0xea2a92f4, 0xcb1cf8ce, 0x4581472e, 0x5881c4bb)
-    //     );
-    // }
 }
+

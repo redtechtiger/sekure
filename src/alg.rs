@@ -1,10 +1,19 @@
-pub fn encrypt(input: String, key: [u32; 8], nonce: [u32; 3], block: u32) -> Result<Vec<u8>, ()> {
+pub fn encrypt(plaintext: String, key: [u32; 8], nonce: [u32; 3], counter: u32) -> Result<Vec<u8>, ()> {
+    let mut encrypted_message = 
+    // Loop for every 64 characters, i.e. every 512 bits
+    for j in 0..(plaintext.len()/64)-1 { // TODO: Check if this works or whether we need a floor
+                                         // call
+        let key_stream = block(key, nonce, counter+j as u32);
+        let input_block = plaintext[j*64..plaintext.len()-1];
+
+    }
+
     todo!("Encrypting isn't implemented yet");
 }
 
-pub fn block(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u8; 64] {
+pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u8; 64] {
     // Get initial state
-    let init_state = init_state(key, nonce, block);
+    let init_state = init_state(key, nonce, counter);
     let mut working_state = init_state;
 
     // Execute rounds
@@ -32,7 +41,7 @@ pub fn decrypt(input: Vec<u8>, key: String) -> Result<String, ()> {
     todo!("Decrypting isn't implemented yet");
 }
 
-fn init_state(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u32; 16] {
+fn init_state(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
     // Declare matrix (initialization isn't important, it will be overwritten anyways)
     let mut state: [u32; 16] = [0; 16];
 
@@ -55,7 +64,7 @@ fn init_state(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u32; 16] {
     state[11] = key[7];
 
     // Forth row: Block count and nonce
-    state[12] = block;
+    state[12] = counter;
     state[13] = nonce[0];
     state[14] = nonce[1];
     state[15] = nonce[2];

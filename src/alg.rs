@@ -8,7 +8,7 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u8; 64] {
     let mut working_state = init_state;
 
     // Execute rounds
-    for i in 0..11 {
+    for i in 0..10 {
         quarter_round(&mut working_state, 0, 4, 8, 12);
         quarter_round(&mut working_state, 1, 5, 9, 13);
         quarter_round(&mut working_state, 2, 6, 10, 14);
@@ -19,6 +19,14 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u8; 64] {
         quarter_round(&mut working_state, 3, 4, 9, 14);
     }
     let final_state = add_states(init_state, working_state);
+
+    dbg!("WORKING STATE");
+    for state in working_state {
+        println!("{:x}",state);
+    }
+    dbg!(working_state);
+    dbg!("FINAL STATE");
+    dbg!(final_state);
 
     // Serialize
     let mut serialized: [u8; 64] = [0; 64];
@@ -154,7 +162,8 @@ mod tests {
 
     #[test]
     fn block_1() {
-
+        let out = block([0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c], [0x09000000, 0x4a000000, 0x00000000], 1);
+        dbg!(out);
     }
 
 }

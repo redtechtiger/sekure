@@ -1,12 +1,10 @@
 pub fn encrypt(plaintext: String, key: [u32; 8], nonce: [u32; 3], counter: u32) -> Result<Vec<u8>, ()> {
     let mut encrypted_message = 
     // Loop for every 64 characters, i.e. every 512 bits
-    for j in 0..(plaintext.len()/64)-1 { // TODO: Check if this works or whether we need a floor
-                                         // call
+    for j in 0..(plaintext.len()/64)-1 { // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter+j as u32);
-        let input_block = plaintext[j*64..plaintext.len()-1];
-
-    }
+        let input_block = &plaintext[j*64..plaintext.len()-1];
+    };
 
     todo!("Encrypting isn't implemented yet");
 }
@@ -26,7 +24,7 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u8; 64] {
         quarter_round(&mut working_state, 1, 6, 11, 12);
         quarter_round(&mut working_state, 2, 7, 8, 13);
         quarter_round(&mut working_state, 3, 4, 9, 14);
-    }
+    };
     let final_state = add_states(init_state, working_state);
 
     // Serialize

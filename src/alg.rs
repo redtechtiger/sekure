@@ -20,18 +20,10 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], block: u32) -> [u8; 64] {
     }
     let final_state = add_states(init_state, working_state);
 
-    dbg!("WORKING STATE");
-    for state in working_state {
-        println!("{:x}",state);
-    }
-    dbg!(working_state);
-    dbg!("FINAL STATE");
-    dbg!(final_state);
-
     // Serialize
     let mut serialized: [u8; 64] = [0; 64];
     for i in 0..16 {
-        serialized[4*i..][..4].copy_from_slice(&working_state[i].to_le_bytes());
+        serialized[4*i..][..4].copy_from_slice(&final_state[i].to_le_bytes());
     }
     serialized
 }

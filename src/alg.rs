@@ -6,6 +6,7 @@ pub fn encrypt(plaintext: Vec<u8>, key: [u32; 8], nonce: [u32; 3], counter: u32)
         let input_block = &plaintext[j*64..plaintext.len()-1]; // Grab the current 64 characters
                                                                // (512 bits) that we're processing
         
+        // encrypted_message.push();
 
     };
 
@@ -99,10 +100,10 @@ fn add_states(state1: [u32; 16], state2: [u32; 16]) -> [u32; 16] {
     sum_state
 }
 
-fn xor_state(state1: [u32; 16], state2: [u32; 16]) -> [u32; 16] {
+fn xor_serialized(state1: [u8; 64], state2: [u8; 64]) -> [u8; 64] {
     // Calculate XOR between two states into a third
-    let mut xor_state: [u32; 16] = [0; 16];
-    for i in 0..16 {
+    let mut xor_state: [u8; 64] = [0; 64];
+    for i in 0..64 {
         xor_state[i] = state1[i] ^ state2[i];
     }
     xor_state

@@ -1,9 +1,11 @@
-pub fn encrypt(plaintext: String, key: [u32; 8], nonce: [u32; 3], counter: u32) -> Result<Vec<u8>, ()> {
-    let mut encrypted_message = 
+pub fn encrypt(plaintext: Vec<u8>, key: [u32; 8], nonce: [u32; 3], counter: u32) -> Result<Vec<u8>, ()> {
+    let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
     for j in 0..(plaintext.len()/64)-1 { // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter+j as u32);
-        let input_block = &plaintext[j*64..plaintext.len()-1];
+        let input_block = &plaintext[j*64..plaintext.len()-1]; // Grab the current 64 characters
+                                                               // (512 bits) that we're processing
+
     };
 
     todo!("Encrypting isn't implemented yet");

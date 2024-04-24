@@ -12,21 +12,30 @@ pub fn encrypt(
         println!("Computing block {}...",i);
         // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
-        let input_block: &[u8] = &plaintext[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes. If, for any reason, the slice has the incorrect size, we immediately panic and exit.
-        dbg!(&serialize_state(key_stream));
-        dbg!(&input_block);
-        dbg!(serialize_state(key_stream).len());
-        dbg!(input_block.len());
+        let input_block: &[u8] = &plaintext[i * 64..i * 64 + 63]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.        
+        dbg!((i*64, i*64+63));
+        // dbg!(&serialize_state(key_stream));
+        // dbg!(&input_block);
+        for byte in input_block {
+            println!("BLOCK {:x}",byte)
+        }
+        // dbg!(serialize_state(key_stream).len());
+        // dbg!(input_block.len());
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
         encrypted_message.extend_from_slice(&encrypted_block);
     }
     // Check if there's a partial block left
     if plaintext.len()%64 != 0 {
-        println!("Computing final odd block...");
+        println!("Computing final odd block {}...",plaintext.len()/64);
         let i = plaintext.len()/64;
         let key_stream = block(key, nonce, counter + i as u32);
-        let input_block: &[u8] = &plaintext[i * 64..plaintext.len() - 1];
-        dbg!(&serialize_state(key_stream));
+        let input_block: &[u8] = &plaintext[i * 64..plaintext.len()];
+        dbg!((i*64, plaintext.len()));
+        // dbg!(&serialize_state(key_stream));
+        for byte in input_block {
+            println!("ODD {:x}",byte)
+        }
+        // dbg!(input_block);
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
         encrypted_message.extend_from_slice(&encrypted_block[0..plaintext.len()%64]); // We only
                                                                                       // add the

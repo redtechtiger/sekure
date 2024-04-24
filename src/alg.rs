@@ -1,5 +1,5 @@
 pub fn encrypt(
-    plaintext: Vec<u8>,
+    plaintext: &[u8],
     key: [u32; 8],
     nonce: [u32; 3],
     counter: u32,
@@ -8,11 +8,14 @@ pub fn encrypt(
     // Loop for every 64 characters, i.e. every 512 bits
     dbg!(plaintext.len());
     dbg!(plaintext.len()/64);
+    for byte in plaintext {
+        println!("IN {:x}",byte)
+    }
     for i in 0..(plaintext.len() / 64) {
         println!("Computing block {}...",i);
         // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
-        let input_block: &[u8] = &plaintext[i * 64..i * 64 + 63]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.        
+        let input_block: &[u8] = &plaintext[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.        
         dbg!((i*64, i*64+63));
         // dbg!(&serialize_state(key_stream));
         // dbg!(&input_block);
@@ -285,7 +288,7 @@ mod tests {
 
     #[test]
     fn encrypt_1() {
-        let plaintext = "Ladies and Gentlemen of the class of ’99: If I could offer you only one tip for the future, sunscreen would be it.";
+        let plaintext = b"Ladies and Gentlemen of the class of \xE2\x80\x99: If I could offer you only one tip for the future, sunscreen would be it.";
         let key = 
             [
                 0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918,
@@ -293,7 +296,7 @@ mod tests {
             ];
         let nonce = [0x09000000, 0x4a000000, 0x00000000];
         let counter = 1;
-        let encrypted_data = encrypt(plaintext.into(), key, nonce, counter);
+        let encrypted_data = encrypt(plaintext, key, nonce, counter);
         for byte in encrypted_data {
             println!("{:x}", byte);
         }

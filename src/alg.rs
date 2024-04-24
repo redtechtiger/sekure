@@ -1,16 +1,41 @@
-pub fn encrypt(plaintext: Vec<u8>, key: [u32; 8], nonce: [u32; 3], counter: u32) -> Result<Vec<u8>, ()> {
+pub fn encrypt(
+    plaintext: Vec<u8>,
+    key: [u32; 8],
+    nonce: [u32; 3],
+    counter: u32,
+) -> Vec<u8> {
     let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
-    for j in 0..(plaintext.len()/64)-1 { // TODO: Check if this works or whether we need floor
-        let key_stream = block(key, nonce, counter+j as u32);
-        let input_block = &plaintext[j*64..plaintext.len()-1]; // Grab the current 64 characters
-                                                               // (512 bits) that we're processing
-        
-        // encrypted_message.push();
-
-    };
-
-    todo!("Encrypting isn't implemented yet");
+    dbg!(plaintext.len());
+    dbg!(plaintext.len()/64);
+    for i in 0..(plaintext.len() / 64) {
+        println!("Computing block {}...",i);
+        // TODO: Check if this works or whether we need floor
+        let key_stream = block(key, nonce, counter + i as u32);
+        let input_block: &[u8] = &plaintext[i * 64..i * 64 + 63]; // Grab the current block of 64 characters/512 bits, and serialize into bytes. If, for any reason, the slice has the incorrect size, we immediately panic and exit.
+        dbg!(&key_stream);
+        dbg!(&input_block);
+        let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
+        encrypted_message.extend_from_slice(&encrypted_block);
+    }
+    // Check if there's a partial block left
+    if plaintext.len()%64 != 0 {
+        println!("Computing final odd block...");
+        let i = plaintext.len()/64;
+        let key_stream = block(key, nonce, counter + i as u32);
+        let input_block: &[u8] = &plaintext[i * 64..plaintext.len() - 1];
+        dbg!(&serialize_state(key_stream));
+        let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
+        encrypted_message.extend_from_slice(&encrypted_block[0..plaintext.len()%64]); // We only
+                                                                                      // add the
+                                                                                      // part of
+                                                                                      // the block
+                                                                                      // that
+                                                                                      // actually
+                                                                                      // contains
+                                                                                      // our data
+    }
+    encrypted_message
 }
 
 pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
@@ -28,8 +53,8 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
         quarter_round(&mut working_state, 1, 6, 11, 12);
         quarter_round(&mut working_state, 2, 7, 8, 13);
         quarter_round(&mut working_state, 3, 4, 9, 14);
-    };
-    
+    }
+
     // Return the matrix summation of working state and initial state
     add_states(init_state, working_state)
 }
@@ -100,20 +125,23 @@ fn add_states(state1: [u32; 16], state2: [u32; 16]) -> [u32; 16] {
     sum_state
 }
 
-fn xor_serialized(state1: [u8; 64], state2: [u8; 64]) -> [u8; 64] {
+fn xor_serialized(state1: &[u8], state2: &[u8]) -> Vec<u8> {
     // Calculate XOR between two states into a third
-    let mut xor_state: [u8; 64] = [0; 64];
-    for i in 0..64 {
+    let mut xor_state: Vec<u8> = Vec::new();
+    for i in 0..std::cmp::min(state1.len(),state2.len()) { // TODO: Possibly find a way of
+                                                           // incorporaing bits that doesn't match
+                                                           // up in the final output, instead of
+                                                           // simply discarding them
         xor_state[i] = state1[i] ^ state2[i];
     }
     xor_state
 }
 
-fn serialize_state(state: [u32; 16]) -> [u8; 64] {
+fn serialize_state(state: [u32; 16]) ->  [u8; 64] {
     // Serialize into bytes instead of u32
     let mut serialized: [u8; 64] = [0; 64];
     for i in 0..16 {
-        serialized[4*i..][..4].copy_from_slice(&state[i].to_le_bytes());
+        serialized[4 * i..][..4].copy_from_slice(&state[i].to_le_bytes());
     }
     serialized
 }
@@ -159,21 +187,57 @@ mod tests {
     #[test]
     fn init_state_1() {
         // Test that the state initializes correctly
-        let state = init_state([0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c], [0x09000000, 0x4a000000, 0x00000000], 1);
+        let state = init_state(
+            [
+                0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918,
+                0x1f1e1d1c,
+            ],
+            [0x09000000, 0x4a000000, 0x00000000],
+            1,
+        );
         assert_eq!(
             state,
-            [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574, 0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c, 0x00000001, 0x09000000, 0x4a000000, 0x00000000]
-            );
+            [
+                0x61707865, 0x3320646e, 0x79622d32, 0x6b206574, 0x03020100, 0x07060504, 0x0b0a0908,
+                0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c, 0x00000001, 0x09000000,
+                0x4a000000, 0x00000000
+            ]
+        );
     }
 
     #[test]
     fn add_states_1() {
-        let state1 = [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574, 0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c, 0x00000001, 0x09000000, 0x4a000000, 0x00000000];
-        let state2 = [0x837778abu32, 0xe238d763u32, 0xa67ae21e, 0x5950bb2f, 0xc4f2d0c7, 0xfc62bb2f, 0x8fa018fc, 0x3f5ec7b7, 0x335271c2, 0xf29489f3, 0xeabda8fc, 0x82e46ebd, 0xd19c12b4, 0xb04e16de, 0x9e83d0cb, 0x4e3c50a2];
+        let state1 = [
+            0x61707865, 0x3320646e, 0x79622d32, 0x6b206574, 0x03020100, 0x07060504, 0x0b0a0908,
+            0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c, 0x00000001, 0x09000000,
+            0x4a000000, 0x00000000,
+        ];
+        let state2 = [
+            0x837778abu32,
+            0xe238d763u32,
+            0xa67ae21e,
+            0x5950bb2f,
+            0xc4f2d0c7,
+            0xfc62bb2f,
+            0x8fa018fc,
+            0x3f5ec7b7,
+            0x335271c2,
+            0xf29489f3,
+            0xeabda8fc,
+            0x82e46ebd,
+            0xd19c12b4,
+            0xb04e16de,
+            0x9e83d0cb,
+            0x4e3c50a2,
+        ];
         assert_eq!(
             add_states(state1, state2),
-            [0xe4e7f110, 0x15593bd1, 0x1fdd0f50, 0xc47120a3, 0xc7f4d1c7, 0x0368c033, 0x9aaa2204, 0x4e6cd4c3, 0x466482d2, 0x09aa9f07, 0x05d7c214, 0xa2028bd9, 0xd19c12b5, 0xb94e16de, 0xe883d0cb, 0x4e3c50a2]
-            );
+            [
+                0xe4e7f110, 0x15593bd1, 0x1fdd0f50, 0xc47120a3, 0xc7f4d1c7, 0x0368c033, 0x9aaa2204,
+                0x4e6cd4c3, 0x466482d2, 0x09aa9f07, 0x05d7c214, 0xa2028bd9, 0xd19c12b5, 0xb94e16de,
+                0xe883d0cb, 0x4e3c50a2
+            ]
+        );
     }
 
     // #[test]
@@ -188,14 +252,40 @@ mod tests {
 
     #[test]
     fn block_and_serialize_1() {
-        
-        let out = serialize_state(block([0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918, 0x1f1e1d1c], [0x09000000, 0x4a000000, 0x00000000], 1));
+        let out = serialize_state(block(
+            [
+                0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918,
+                0x1f1e1d1c,
+            ],
+            [0x09000000, 0x4a000000, 0x00000000],
+            1,
+        ));
         assert_eq!(
             out,
-            [0x10, 0xf1, 0xe7, 0xe4, 0xd1, 0x3b, 0x59, 0x15, 0x50, 0x0f, 0xdd, 0x1f, 0xa3, 0x20, 0x71, 0xc4, 0xc7, 0xd1, 0xf4, 0xc7, 0x33, 0xc0, 0x68, 0x03, 0x04, 0x22, 0xaa, 0x9a, 0xc3, 0xd4, 0x6c, 0x4e, 0xd2, 0x82, 0x64, 0x46, 0x07, 0x9f, 0xaa, 0x09, 0x14, 0xc2, 0xd7, 0x05, 0xd9, 0x8b, 0x02, 0xa2, 0xb5, 0x12, 0x9c, 0xd1, 0xde, 0x16, 0x4e, 0xb9, 0xcb, 0xd0, 0x83, 0xe8, 0xa2, 0x50, 0x3c, 0x4e]
-
+            [
+                0x10, 0xf1, 0xe7, 0xe4, 0xd1, 0x3b, 0x59, 0x15, 0x50, 0x0f, 0xdd, 0x1f, 0xa3, 0x20,
+                0x71, 0xc4, 0xc7, 0xd1, 0xf4, 0xc7, 0x33, 0xc0, 0x68, 0x03, 0x04, 0x22, 0xaa, 0x9a,
+                0xc3, 0xd4, 0x6c, 0x4e, 0xd2, 0x82, 0x64, 0x46, 0x07, 0x9f, 0xaa, 0x09, 0x14, 0xc2,
+                0xd7, 0x05, 0xd9, 0x8b, 0x02, 0xa2, 0xb5, 0x12, 0x9c, 0xd1, 0xde, 0x16, 0x4e, 0xb9,
+                0xcb, 0xd0, 0x83, 0xe8, 0xa2, 0x50, 0x3c, 0x4e
+            ]
         )
     }
 
-}
+    #[test]
+    fn encrypt_1() {
+        let plaintext = "Ladies and Gentlemen of the class of ’99: If I could offer you only one tip for the future, sunscreen would be it.";
+        let key = 
+            [
+                0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918,
+                0x1f1e1d1c,
+            ];
+        let nonce = [0x09000000, 0x4a000000, 0x00000000];
+        let counter = 1;
+        let encrypted_data = encrypt(plaintext.into(), key, nonce, counter);
+        for byte in encrypted_data {
+            println!("{:x}", byte);
+        }
 
+    }
+}

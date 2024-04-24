@@ -8,22 +8,22 @@ pub fn encrypt(
     // Loop for every 64 characters, i.e. every 512 bits
     dbg!(plaintext.len());
     dbg!(plaintext.len()/64);
-    for byte in plaintext {
-        println!("IN {:x}",byte)
-    }
+    // for byte in plaintext {
+    //     println!("IN {:x}",byte)
+    // }
     for i in 0..(plaintext.len() / 64) {
         println!("Computing block {}...",i);
         // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &plaintext[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.        
-        dbg!((i*64, i*64+63));
+        // dbg!((i*64, i*64+63));
         // dbg!(&serialize_state(key_stream));
         // dbg!(&input_block);
-        for byte in input_block {
-            println!("BLOCK {:x}",byte)
-        }
-        // dbg!(serialize_state(key_stream).len());
-        // dbg!(input_block.len());
+        // for byte in input_block {
+        //     println!("BLOCK {:x}",byte)
+        // }
+        dbg!(serialize_state(key_stream).len());
+        dbg!(input_block.len());
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
         encrypted_message.extend_from_slice(&encrypted_block);
     }
@@ -33,12 +33,13 @@ pub fn encrypt(
         let i = plaintext.len()/64;
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &plaintext[i * 64..plaintext.len()];
-        dbg!((i*64, plaintext.len()));
+        // dbg!((i*64, plaintext.len()));
         // dbg!(&serialize_state(key_stream));
-        for byte in input_block {
-            println!("ODD {:x}",byte)
-        }
+        // for byte in input_block {
+        //     println!("ODD {:x}",byte)
+        // }
         // dbg!(input_block);
+        dbg!(serialize_state(key_stream).len(), input_block.len());
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
         encrypted_message.extend_from_slice(&encrypted_block[0..plaintext.len()%64]); // We only
                                                                                       // add the
@@ -302,7 +303,7 @@ mod tests {
                 0x03020100, 0x07060504, 0x0b0a0908, 0x0f0e0d0c, 0x13121110, 0x17161514, 0x1b1a1918,
                 0x1f1e1d1c,
             ];
-        let nonce = [0x09000000, 0x4a000000, 0x00000000];
+        let nonce = [0x00000000, 0x4a000000, 0x00000000];
         let counter = 1;
         let encrypted_data = encrypt(plaintext, key, nonce, counter);
         for byte in &encrypted_data {

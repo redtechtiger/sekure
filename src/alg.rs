@@ -1,58 +1,20 @@
 pub fn encrypt(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -> Vec<u8> {
     let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
-    dbg!(plaintext.len());
-    dbg!(plaintext.len() / 64);
-    // for byte in plaintext {
-    //     println!("IN {:x}",byte)
-    // }
     for i in 0..(plaintext.len() / 64) {
-        println!("Computing block {}...", i);
         // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &plaintext[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.
-                                                                  // dbg!((i*64, i*64+63));
-                                                                  // dbg!(&serialize_state(key_stream));
-                                                                  // dbg!(&input_block);
-                                                                  // for byte in input_block {
-                                                                  //     println!("BLOCK {:x}",byte)
-                                                                  // }
-        dbg!(serialize_state(key_stream).len());
-        dbg!(input_block.len());
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
-        println!("ENCRYPTED BLOCK FOLLOWS:");
-        for byte in &encrypted_block {
-            println!("{:x}", byte);
-        }
         encrypted_message.extend_from_slice(&encrypted_block);
     }
     // Check if there's a partial block left
     if plaintext.len() % 64 != 0 {
-        println!("Computing final odd block {}...", plaintext.len() / 64);
         let i = plaintext.len() / 64;
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &plaintext[i * 64..plaintext.len()];
-        // dbg!((i*64, plaintext.len()));
-        // dbg!(&serialize_state(key_stream));
-        // for byte in input_block {
-        //     println!("ODD {:x}",byte)
-        // }
-        // dbg!(input_block);
-        dbg!(serialize_state(key_stream).len(), input_block.len());
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
-        println!("ENCRYPTED BLOCK FOLLOWS:");
-        for byte in &encrypted_block[0..plaintext.len() % 64] {
-            println!("{:x}", byte);
-        }
         encrypted_message.extend_from_slice(&encrypted_block[0..plaintext.len() % 64]);
-        // We only
-        // add the
-        // part of
-        // the block
-        // that
-        // actually
-        // contains
-        // our data
     }
     encrypted_message
 }
@@ -342,9 +304,6 @@ mod tests {
         let nonce = [0x00000000, 0x4a000000, 0x00000000];
         let counter = 1;
         let encrypted_data = encrypt(plaintext, key, nonce, counter);
-        for byte in &encrypted_data {
-            println!("{:x}", byte);
-        }
         assert_eq!(
             encrypted_data,
             [

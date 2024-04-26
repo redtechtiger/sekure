@@ -1,2 +1,3 @@
-mod alg;
+mod cipher;
 mod stream;
+

@@ -1,3 +1,5 @@
+// Implementation of the ChaCha20 encryption/decryption algorithm
+
 pub fn encrypt(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -> Vec<u8> {
     let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits

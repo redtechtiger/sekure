@@ -2,7 +2,6 @@ pub fn encrypt(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -
     let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
     for i in 0..(plaintext.len() / 64) {
-        // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &plaintext[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
@@ -23,7 +22,6 @@ pub fn decrypt(encrypted: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -
     let mut plaintext: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
     for i in 0..(encrypted.len() / 64) {
-        // TODO: Check if this works or whether we need floor
         let key_stream = block(key, nonce, counter + i as u32);
         let input_block: &[u8] = &encrypted[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.
         let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
@@ -127,10 +125,6 @@ fn xor_serialized(state1: &[u8], state2: &[u8]) -> Vec<u8> {
     // Calculate XOR between two states into a third
     let mut xor_state: Vec<u8> = Vec::new();
     for i in 0..std::cmp::min(state1.len(), state2.len()) {
-        // TODO: Possibly find a way of
-        // incorporaing bits that doesn't match
-        // up in the final output, instead of
-        // simply discarding them
         xor_state.push(state1[i] ^ state2[i]);
     }
     xor_state

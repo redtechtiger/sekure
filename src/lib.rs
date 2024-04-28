@@ -1,5 +1,4 @@
-mod cipher;
-mod stream;
-mod polyauth;
 mod bcrypt;
-
+mod cipher;
+mod polyauth;
+mod stream;

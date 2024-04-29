@@ -7,11 +7,10 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let P: BigUint = BigUint::parse_bytes(b"3fffffffffffffffffffffffffffffffb", 16).unwrap(); // TODO: Fix this garbage
     let mut acc = 0;
 
-    for i in 0..msg.len().div_ceil(16) { // Iterate over every 16 byte block
-         // Do stuff (see reference RFC 7539, 2.5)
-         let n: BigUint = BigUint::from_bytes_le(&msg[i*16..i*16+15]);
-         
-         
+    for i in 0..msg.len().div_ceil(16) {
+        // Iterate over every 16 byte block
+        // Do stuff (see reference RFC 7539, 2.5)
+        let n: BigUint = BigUint::from_bytes_le(&msg[i * 16..i * 16 + 15]);
     }
 
     todo!();

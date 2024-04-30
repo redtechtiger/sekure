@@ -1,4 +1,4 @@
-use num_bigint::BigUint;
+use crate::bignum;
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let r = clamp(&mut key[0..15].try_into().unwrap()); // TODO: Figure out if we can get rid of

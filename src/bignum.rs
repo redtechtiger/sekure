@@ -7,5 +7,8 @@ impl Add for BigU288 {
     fn add_msb(&mut self) {
         
     }
+    fn from_slice(bytes: &[u8]) -> BigU288 {
+
+    }
 }
 

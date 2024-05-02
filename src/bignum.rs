@@ -18,6 +18,13 @@ impl Add for BigU288 {
     }
 }
 
+impl PartialEq for BigU288 {
+    fn eq(&self, other: &BigU288) -> bool {
+        self.0 == other.0
+    }
+}
+impl Eq for BigU288 {}
+
 impl BigU288 {
     fn add_msb(&mut self) {
         // TODO: Important! Attempt to solve this in constant time
@@ -40,6 +47,9 @@ impl BigU288 {
         };
         big_u288
     }
+    fn get_bytes(&self) -> [u8;36] {
+        self.0
+    }
     fn new() -> BigU288 {
         BigU288([0; 36])
     }
@@ -53,10 +63,36 @@ mod tests {
     // fn add_msb_1() {
     // }
     
+    // #[test]
+    // fn from_hex_1() {
+    //     let big_u288 = BigU288::from_hex("3fffffffffffffffffffffffffffffffb");
+    //     assert_eq!(
+    //         BigU288::from_hex()
+    //     )
+    // }
+
     #[test]
-    fn from_hex_1() {
-        let big_u288 = BigU288::from_hex("3fffffffffffffffffffffffffffffffb");
-        dbg!(big_u288);
+    fn from_hex_2() {
+        assert_eq!(
+            BigU288::from_hex("f").get_bytes(),
+            [15u8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        );
+    }
+
+    #[test]
+    fn from_hex_3() {
+        assert_eq!(
+            BigU288::from_hex("ff").get_bytes(),
+            [255u8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        );
+    }
+
+    #[test]
+    fn from_hex_4() {
+        assert_eq!(
+            BigU288::from_hex("1fff").get_bytes(),
+            [255u8,31u8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        );
     }
 
     // #[test]
@@ -68,11 +104,11 @@ mod tests {
     #[test]
     fn add_1() {
         let big_u288 = BigU288::from_hex("1");
-        dbg!(&big_u288);
         let add = BigU288::from_hex("ff");
-        dbg!(&add);
-        let final_u288 = big_u288 + add;
-        dbg!(final_u288);
+        assert_eq!(
+            BigU288::from_hex("1") + BigU288::from_hex("ff"),
+            BigU288::from_hex("101")
+        );
     }
 }
 

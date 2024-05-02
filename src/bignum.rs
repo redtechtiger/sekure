@@ -23,8 +23,8 @@ impl BigU288 {
         // TODO: Important! Attempt to solve this in constant time
         let mut i: bool = false; // Flag to see if we've hit the msb yet
         for (index, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
-            let bit_1 = byte & 0b1000_0000; // Shift 
-            let bit_1 = byte & 0b0000_0001; // Shift 
+            // let bit_1 = byte & 0b1000_0000; // Shift 
+            // let bit_1 = byte & 0b0000_0001; // Shift 
         }
         todo!("msb isn't implemented yet");
     }
@@ -35,7 +35,8 @@ impl BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
         for (index, char) in input.chars().rev().enumerate() {
-            big_u288.0[index] = u8::from_str_radix(&char.to_string(), 16).expect("invalid character found");
+            let nibble = u8::from_str_radix(&char.to_string(), 16).expect("invalid character found");
+            big_u288.0[index/2] += nibble << 4*(index%2);
         };
         big_u288
     }
@@ -66,9 +67,10 @@ mod tests {
 
     #[test]
     fn add_1() {
-        let big_u288 = BigU288::from_hex("7");
+        let big_u288 = BigU288::from_hex("1");
         dbg!(&big_u288);
-        let add = BigU288::from_hex("16");
+        let add = BigU288::from_hex("ff");
+        dbg!(&add);
         let final_u288 = big_u288 + add;
         dbg!(final_u288);
     }

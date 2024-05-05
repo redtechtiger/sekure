@@ -26,7 +26,7 @@ impl PartialEq for BigU288 {
 impl Eq for BigU288 {}
 
 impl BigU288 {
-    fn add_msb(&mut self) {
+    pub fn add_msb(&mut self) {
         // TODO: Important! Attempt to solve this in constant time
         let mut i: bool = false; // Flag to see if we've hit the msb yet
         for (index, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
@@ -35,10 +35,14 @@ impl BigU288 {
         }
         todo!("msb isn't implemented yet");
     }
-    fn from_slice(bytes: &[u8]) -> BigU288 {
+    pub fn from_slice(bytes: &[u8]) -> BigU288 {
+        let mut big_u288 = BigU288::new();
+        for index in 0..288 {
+            big_u288.0[index] = bytes[index];
+        }
         todo!();
     }
-    fn from_hex(input: &str) -> BigU288 {
+    pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
         for (index, char) in input.chars().rev().enumerate() { // TODO: Make this constant time!!!
@@ -47,10 +51,10 @@ impl BigU288 {
         };
         big_u288
     }
-    fn get_bytes(&self) -> [u8;36] {
+    pub fn get_bytes(&self) -> [u8;36] {
         self.0
     }
-    fn new() -> BigU288 {
+    pub fn new() -> BigU288 {
         BigU288([0; 36])
     }
 }

@@ -13,6 +13,7 @@ impl Add for BigU288 {
             let carry = (*byte as u16 + other.0[index] as u16) - output.0[index] as u16;
             output.0[std::cmp::min(index + 1, output.0.len() - 1)] = carry as u8;
         }
+        todo!("carry doesn't work");
         output
     }
 }
@@ -39,15 +40,17 @@ impl BigU288 {
         for index in 0..288 {
             big_u288.0[index] = bytes[index];
         }
-        todo!();
+        todo!("indexe goes out of bounds");
     }
     pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
-        for (index, char) in input.chars().rev().enumerate() {
+        // for (index, char) in input.chars().rev().enumerate() {
+        for index in (0..72).rev() {
             // TODO: Make this constant time!!!
+            let char = input.as_bytes().get(index).unwrap_or(&b'0');
             let hex_digit =
-                u8::from_str_radix(&char.to_string(), 16).expect("invalid character found");
+                u8::from_str_radix(&String::from_utf8(vec![*char]).unwrap(), 16).expect("invalid character found");
             big_u288.0[index / 2] += hex_digit << 4 * (index % 2);
         }
         big_u288

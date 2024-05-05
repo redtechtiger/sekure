@@ -46,8 +46,8 @@ impl BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
         for (index, char) in input.chars().rev().enumerate() { // TODO: Make this constant time!!!
-            let nibble = u8::from_str_radix(&char.to_string(), 16).expect("invalid character found");
-            big_u288.0[index/2] += nibble << 4*(index%2);
+            let hex_digit = u8::from_str_radix(&char.to_string(), 16).expect("invalid character found");
+            big_u288.0[index/2] += hex_digit << 4*(index%2);
         };
         big_u288
     }

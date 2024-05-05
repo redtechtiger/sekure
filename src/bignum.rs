@@ -42,6 +42,8 @@ impl BigU288 {
         }
         todo!("indexe goes out of bounds");
     }
+    // TODO: Revert to original idea of iterating over reversed input, EXCEPT PAD WITH ZEROES AFTER
+    // REVERSING AND BEFORE ITERATING! This might fix the side channel timing leak?
     pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)

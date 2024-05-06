@@ -10,10 +10,9 @@ impl Add for BigU288 {
         for (index, byte) in self.0.iter().enumerate() {
             // LSB first
             output.0[index] += byte.wrapping_add(other.0[index]);
-            let carry = (*byte as u16 + other.0[index] as u16) - output.0[index] as u16;
-            output.0[std::cmp::min(index + 1, output.0.len() - 1)] = carry as u8;
+            let carry = (*byte as u16 + other.0[index] as u16).checked_sub(output.0[index] as u16).unwrap_or(0);
+            output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry/256) as u8;
         }
-        todo!("carry doesn't work");
         output
     }
 }
@@ -127,11 +126,9 @@ mod tests {
 
     #[test]
     fn add_1() {
-        let big_u288 = BigU288::from_hex("1");
-        let add = BigU288::from_hex("ff");
         assert_eq!(
             BigU288::from_hex("1") + BigU288::from_hex("ff"),
-            BigU288::from_hex("101")
+            BigU288::from_hex("100")
         );
     }
 

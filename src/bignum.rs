@@ -40,10 +40,8 @@ impl BigU288 {
     }
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
-        for index in 0..288 {
-            big_u288.0[index] = bytes[index];
-        }
-        todo!("index goes out of bounds");
+        big_u288.0 = pad_array(bytes.to_vec()).as_slice().try_into().unwrap();
+        big_u288
     }
     pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
@@ -68,7 +66,7 @@ impl BigU288 {
 }
 
 fn pad_array(input: Vec<u8>) -> Vec<u8> {
-    let mut padded = [0u8; 72];
+    let mut padded = [0u8; 72]; // TODO: Make this configurable
     padded[..input.len()].copy_from_slice(&input);
     padded.to_vec()
 }
@@ -97,6 +95,14 @@ mod tests {
                 15u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0
             ]
+        );
+    }
+
+    #[test]
+    fn from_slice_1() {
+        assert_eq!(
+            BigU288::from_slice(&[1,1]),
+            BigU288::from_hex("F")
         );
     }
 

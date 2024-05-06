@@ -40,19 +40,18 @@ impl BigU288 {
         for index in 0..288 {
             big_u288.0[index] = bytes[index];
         }
-        todo!("indexe goes out of bounds");
+        todo!("index goes out of bounds");
     }
-    // TODO: Revert to original idea of iterating over reversed input, EXCEPT PAD WITH ZEROES AFTER
-    // REVERSING AND BEFORE ITERATING! This might fix the side channel timing leak?
     pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
-        // for (index, char) in input.chars().rev().enumerate() {
         let input_padded_le = pad_array(input.bytes().rev().collect());
-        for (index,char) in input_padded_le.iter().enumerate() {
-            // TODO: Make this constant time!!!
-            let hex_digit =
-                u8::from_str_radix(&String::from_utf8(vec![*char]).unwrap_or("0".to_string()), 16).unwrap_or(0);
+        for (index, char) in input_padded_le.iter().enumerate() {
+            let hex_digit = u8::from_str_radix(
+                &String::from_utf8(vec![*char]).unwrap_or("0".to_string()),
+                16,
+            )
+            .unwrap_or(0);
             big_u288.0[index / 2] += hex_digit << 4 * (index % 2);
         }
         big_u288
@@ -69,7 +68,6 @@ fn pad_array(input: Vec<u8>) -> Vec<u8> {
     let mut padded = [0u8; 72];
     padded[..input.len()].copy_from_slice(&input);
     padded.to_vec()
-   
 }
 
 #[cfg(test)]
@@ -137,13 +135,15 @@ mod tests {
         );
     }
 
-
-
     #[test]
     fn pad_array_1() {
         assert_eq!(
             pad_array(vec![255, 255]),
-            vec![255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+            vec![
+                255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ]
         );
     }
 }

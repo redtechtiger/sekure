@@ -40,13 +40,13 @@ impl BigU288 {
     }
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
-        big_u288.0 = pad_array(bytes.to_vec()).as_slice().try_into().unwrap();
+        big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();
         big_u288
     }
     pub fn from_hex(input: &str) -> BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
-        let input_padded_le = pad_array(input.bytes().rev().collect());
+        let input_padded_le: [u8; 72] = pad_array_hex(&input.bytes().rev().collect::<Vec<_>>()[..]);
         for (index, char) in input_padded_le.iter().enumerate() {
             let hex_digit = u8::from_str_radix(
                 &String::from_utf8(vec![*char]).unwrap_or("0".to_string()),
@@ -65,10 +65,16 @@ impl BigU288 {
     }
 }
 
-fn pad_array(input: Vec<u8>) -> Vec<u8> {
+fn pad_array_hex(input: &[u8]) -> [u8; 72] {
     let mut padded = [0u8; 72]; // TODO: Make this configurable
-    padded[..input.len()].copy_from_slice(&input);
-    padded.to_vec()
+    padded[..input.len()].copy_from_slice(input);
+    padded
+}
+
+fn pad_array_bigu288(input: &[u8]) -> [u8; 36] {
+    let mut padded = [0u8; 36]; // TODO: Make this configurable
+    padded[..input.len()].copy_from_slice(input);
+    padded
 }
 
 #[cfg(test)]
@@ -102,7 +108,15 @@ mod tests {
     fn from_slice_1() {
         assert_eq!(
             BigU288::from_slice(&[1,1]),
-            BigU288::from_hex("F")
+            BigU288::from_hex("101")
+        );
+    }
+
+    #[test]
+    fn from_slice_2() {
+        assert_eq!(
+            BigU288::from_slice(&[255,16]),
+            BigU288::from_hex("10FF")
         );
     }
 
@@ -152,11 +166,11 @@ mod tests {
     }
 
     #[test]
-    fn pad_array_1() {
+    fn pad_array_hex_1() {
         assert_eq!(
-            pad_array(vec![255, 255]),
-            vec![
-                255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            pad_array_hex(&[255, 255]),
+            [
+                255u8, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             ]

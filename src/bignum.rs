@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
 #[derive(Debug)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -18,6 +18,14 @@ impl Add for BigU288 {
             output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry / 256) as u8;
         }
         output
+    }
+}
+
+impl Mul for BigU288 {
+    type Output = BigU288;
+    fn mul(self, other: Self) -> Self::Output {
+        
+        BigU288::new()
     }
 }
 

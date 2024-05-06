@@ -1,19 +1,25 @@
 use crate::bignum::BigU288;
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
-    let r = clamp(&mut key[0..15].try_into().unwrap()); // TODO: Figure out if we can get rid of
-                                                        // the ugly .try_into().unwrap()
+    let mut r = key[0..15].try_into().unwrap();
+    clamp(&mut r); // TODO: Figure out if we can get rid of
+                   // the ugly .try_into().unwrap()
     let s = &key[16..31];
-    let P: BigU288 = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // TODO: Fix this garbage
-    let mut acc = 0;
+    let P = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // TODO: Fix this garbage
+    let mut acc = BigU288::new();
 
     for i in 0..msg.len().div_ceil(16) {
         // Iterate over every 16 byte block
         // Do stuff (see reference RFC 7539, 2.5)
-        let n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
+        let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
+        n.add_msb();
+        acc = acc + n;
+        acc = (acc * r) % P;
     }
 
+    acc = acc + BigU288::from_slice(s);
     todo!();
+    acc.get_bytes().to_vec()
 }
 
 fn clamp(r: &mut [u8; 16]) -> () {

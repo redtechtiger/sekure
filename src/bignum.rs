@@ -24,8 +24,12 @@ impl Add for BigU288 {
 impl Mul for BigU288 {
     type Output = BigU288;
     fn mul(self, other: Self) -> Self::Output {
-        
-        BigU288::new()
+        let mut total_sum = BigU288::new();
+        for byte_self in self.0 {
+            let mut working_sum = BigU288::new();
+
+        }
+        total_sum
     }
 }
 

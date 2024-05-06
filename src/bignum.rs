@@ -11,9 +11,11 @@ impl Add for BigU288 {
             // LSB first
             let original_result_byte = output.0[index];
             output.0[index] += byte.wrapping_add(other.0[index]);
-            let carry = (*byte as u16 + other.0[index] as u16 + original_result_byte as u16).checked_sub(output.0[index] as u16).unwrap_or(0);
-            dbg!(carry, carry/256);
-            output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry/256) as u8;
+            let carry = (*byte as u16 + other.0[index] as u16 + original_result_byte as u16)
+                .checked_sub(output.0[index] as u16)
+                .unwrap_or(0);
+            dbg!(carry, carry / 256);
+            output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry / 256) as u8;
         }
         output
     }
@@ -137,11 +139,11 @@ mod tests {
     #[test]
     fn add_2() {
         assert_eq!(
-            BigU288::from_hex("C1583054D5A6350B37E23A") + BigU288::from_hex("2A677ACE04C0037CA98B6BC"),
+            BigU288::from_hex("C1583054D5A6350B37E23A")
+                + BigU288::from_hex("2A677ACE04C0037CA98B6BC"),
             BigU288::from_hex("367cfdd3521a66cd5d098f6")
         );
     }
-
 
     #[test]
     fn pad_array_1() {

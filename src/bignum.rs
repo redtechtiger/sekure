@@ -48,11 +48,11 @@ impl BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
         // for (index, char) in input.chars().rev().enumerate() {
-        for index in (0..72).rev() {
+        let input_padded_le = pad_array(input.bytes().rev().collect());
+        for (index,char) in input_padded_le.iter().enumerate() {
             // TODO: Make this constant time!!!
-            let char = input.as_bytes().get(index).unwrap_or(&b'0');
             let hex_digit =
-                u8::from_str_radix(&String::from_utf8(vec![*char]).unwrap(), 16).expect("invalid character found");
+                u8::from_str_radix(&String::from_utf8(vec![*char]).unwrap_or("0".to_string()), 16).unwrap_or(0);
             big_u288.0[index / 2] += hex_digit << 4 * (index % 2);
         }
         big_u288
@@ -63,6 +63,13 @@ impl BigU288 {
     pub fn new() -> BigU288 {
         BigU288([0; 36])
     }
+}
+
+fn pad_array(input: Vec<u8>) -> Vec<u8> {
+    let mut padded = [0u8; 72];
+    padded[..input.len()].copy_from_slice(&input);
+    padded.to_vec()
+   
 }
 
 #[cfg(test)]
@@ -127,6 +134,16 @@ mod tests {
         assert_eq!(
             BigU288::from_hex("1") + BigU288::from_hex("ff"),
             BigU288::from_hex("101")
+        );
+    }
+
+
+
+    #[test]
+    fn pad_array_1() {
+        assert_eq!(
+            pad_array(vec![255, 255]),
+            vec![255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
         );
     }
 }

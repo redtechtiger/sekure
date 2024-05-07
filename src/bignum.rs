@@ -7,14 +7,14 @@ impl Add for BigU288 {
     type Output = BigU288;
     fn add(self, other: Self) -> Self::Output {
         let mut output = BigU288::new();
-        for (index, byte) in self.0.iter().enumerate() {
+        for (i, byte) in self.0.iter().enumerate() {
             // LSB first
-            let original_result_byte = output.0[index];
-            output.0[index] += byte.wrapping_add(other.0[index]);
-            let carry = (*byte as u16 + other.0[index] as u16 + original_result_byte as u16)
-                .checked_sub(output.0[index] as u16)
+            let original_result_byte = output.0[i];
+            output.0[i] += byte.wrapping_add(other.0[i]);
+            let carry = (*byte as u16 + other.0[i] as u16 + original_result_byte as u16)
+                .checked_sub(output.0[i] as u16)
                 .unwrap_or(0);
-            output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry / 256) as u8;
+            output.0[std::cmp::min(i + 1, output.0.len() - 1)] = (carry / 256) as u8;
         }
         output
     }
@@ -27,14 +27,14 @@ impl Mul for BigU288 {
         for (i, byte_self) in self.0.iter().enumerate() {
             // Multiply entire second number by each byte in self
             let mut working_sum = BigU288::new();
-            for (index, byte_other) in other.0.iter().enumerate() {
-                let original_working_byte = working_sum.0[index];
-                working_sum.0[index] += byte_self.wrapping_mul(*byte_other);
+            for (i, byte_other) in other.0.iter().enumerate() {
+                let original_working_byte = working_sum.0[i];
+                working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
                 let carry = (original_working_byte as u16
                     + (*byte_self as u16 * *byte_other as u16))
-                    .checked_sub(working_sum.0[index] as u16)
+                    .checked_sub(working_sum.0[i] as u16)
                     .unwrap_or(0);
-                working_sum.0[std::cmp::min(index + 1, working_sum.0.len() - 1)] =
+                working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] =
                     (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
@@ -62,7 +62,7 @@ impl BigU288 {
     pub fn add_msb(&mut self) {
         // TODO: Important! Attempt to solve this in constant time
         let mut i: bool = false; // Flag to see if we've hit the msb yet
-        for (index, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
+        for (i, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
              // let bit_1 = byte & 0b1000_0000; // Shift
              // let bit_1 = byte & 0b0000_0001; // Shift
         }
@@ -77,13 +77,13 @@ impl BigU288 {
         let mut big_u288 = BigU288::new();
         // Iterate over the string backwards (we want little endian)
         let input_padded_le: [u8; 72] = pad_array_hex(&input.bytes().rev().collect::<Vec<_>>()[..]);
-        for (index, char) in input_padded_le.iter().enumerate() {
+        for (i, char) in input_padded_le.iter().enumerate() {
             let hex_digit = u8::from_str_radix(
                 &String::from_utf8(vec![*char]).unwrap_or("0".to_string()),
                 16,
             )
             .unwrap_or(0);
-            big_u288.0[index / 2] += hex_digit << 4 * (index % 2);
+            big_u288.0[i / 2] += hex_digit << 4 * (i % 2);
         }
         big_u288
     }

@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul, Rem};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
 
 impl Add for BigU288 {

@@ -30,12 +30,14 @@ impl Mul for BigU288 {
             for (index, byte_other) in other.0.iter().enumerate() {
                 let original_working_byte = working_sum.0[index];
                 working_sum.0[index] += byte_self.wrapping_mul(*byte_other);
-                let carry = (original_working_byte as u16 + (*byte_self as u16 * *byte_other as u16)).checked_sub(working_sum.0[index] as u16).unwrap_or(0);
-                dbg!(carry, working_sum.0);
-                working_sum.0[std::cmp::min(index + 1, working_sum.0.len()-1)] = (carry/256) as u8;
+                let carry = (original_working_byte as u16
+                    + (*byte_self as u16 * *byte_other as u16))
+                    .checked_sub(working_sum.0[index] as u16)
+                    .unwrap_or(0);
+                working_sum.0[std::cmp::min(index + 1, working_sum.0.len() - 1)] =
+                    (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
-            dbg!("Working sum after:", working_sum.0);
             total_sum = total_sum + working_sum;
         }
         total_sum
@@ -45,7 +47,6 @@ impl Mul for BigU288 {
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
-
         todo!("implement modulo");
     }
 }
@@ -135,18 +136,12 @@ mod tests {
 
     #[test]
     fn from_slice_1() {
-        assert_eq!(
-            BigU288::from_slice(&[1,1]),
-            BigU288::from_hex("101")
-        );
+        assert_eq!(BigU288::from_slice(&[1, 1]), BigU288::from_hex("101"));
     }
 
     #[test]
     fn from_slice_2() {
-        assert_eq!(
-            BigU288::from_slice(&[255,16]),
-            BigU288::from_hex("10FF")
-        );
+        assert_eq!(BigU288::from_slice(&[255, 16]), BigU288::from_hex("10FF"));
     }
 
     #[test]
@@ -209,8 +204,7 @@ mod tests {
     #[test]
     fn multiply_1() {
         assert_eq!(
-            BigU288::from_slice(&[255,100])
-                * BigU288::from_slice(&[005, 000]),
+            BigU288::from_slice(&[255, 100]) * BigU288::from_slice(&[005, 000]),
             BigU288::from_slice(&[251, 248, 001])
         );
     }

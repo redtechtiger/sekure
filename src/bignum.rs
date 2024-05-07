@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Rem};
 
 #[derive(Debug)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -35,6 +35,14 @@ impl Mul for BigU288 {
             total_sum = total_sum + working_sum;
         }
         total_sum
+    }
+}
+
+impl Rem for BigU288 {
+    type Output = BigU288;
+    fn rem(self, other: Self) -> Self::Output {
+
+        todo!("implement modulo");
     }
 }
 

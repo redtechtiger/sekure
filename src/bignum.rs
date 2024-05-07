@@ -14,7 +14,6 @@ impl Add for BigU288 {
             let carry = (*byte as u16 + other.0[index] as u16 + original_result_byte as u16)
                 .checked_sub(output.0[index] as u16)
                 .unwrap_or(0);
-            dbg!(carry, carry / 256);
             output.0[std::cmp::min(index + 1, output.0.len() - 1)] = (carry / 256) as u8;
         }
         output
@@ -25,13 +24,18 @@ impl Mul for BigU288 {
     type Output = BigU288;
     fn mul(self, other: Self) -> Self::Output {
         let mut total_sum = BigU288::new();
-        for byte_self in self.0 {
+        for (i, byte_self) in self.0.iter().enumerate() {
             // Multiply entire second number by each byte in self
             let mut working_sum = BigU288::new();
-            for byte_other in other.0 {
-                // TODO: For future me to figure out
+            for (index, byte_other) in other.0.iter().enumerate() {
+                let original_working_byte = working_sum.0[index];
+                working_sum.0[index] += byte_self.wrapping_mul(*byte_other);
+                let carry = (original_working_byte as u16 + (*byte_self as u16 * *byte_other as u16)).checked_sub(working_sum.0[index] as u16).unwrap_or(0);
+                dbg!(carry, working_sum.0);
+                working_sum.0[std::cmp::min(index + 1, working_sum.0.len()-1)] = (carry/256) as u8;
             }
-
+            working_sum.0.rotate_right(i);
+            dbg!("Working sum after:", working_sum.0);
             total_sum = total_sum + working_sum;
         }
         total_sum
@@ -199,6 +203,15 @@ mod tests {
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             ]
+        );
+    }
+
+    #[test]
+    fn multiply_1() {
+        assert_eq!(
+            BigU288::from_slice(&[255,100])
+                * BigU288::from_slice(&[005, 000]),
+            BigU288::from_slice(&[251, 248, 001])
         );
     }
 }

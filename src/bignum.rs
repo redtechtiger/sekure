@@ -26,8 +26,13 @@ impl Mul for BigU288 {
     fn mul(self, other: Self) -> Self::Output {
         let mut total_sum = BigU288::new();
         for byte_self in self.0 {
+            // Multiply entire second number by each byte in self
             let mut working_sum = BigU288::new();
+            for byte_other in other.0 {
+                // TODO: For future me to figure out
+            }
 
+            total_sum = total_sum + working_sum;
         }
         total_sum
     }

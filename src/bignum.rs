@@ -208,4 +208,12 @@ mod tests {
             BigU288::from_slice(&[251, 248, 001])
         );
     }
+
+    #[test]
+    fn multiply_2() {
+        assert_eq!(
+            BigU288::from_slice(&[255, 255, 255, 000]) * BigU288::from_slice(&[255, 000, 000, 000]),
+            BigU288::from_slice(&[001, 255, 255, 254])
+        );
+    }
 }

@@ -63,6 +63,17 @@ impl BigU288 {
         // TODO: Important! Attempt to solve this in constant time
         let mut i: bool = false; // Flag to see if we've hit the msb yet
         for (i, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
+            let bit_1 = byte & 0b0000_0001;
+            let bit_2 = byte & 0b0000_0010;
+            let bit_3 = byte & 0b0000_0100;
+            let bit_4 = byte & 0b0000_1000;
+            let bit_5 = byte & 0b0001_0000;
+            let bit_6 = byte & 0b0010_0000;
+            let bit_7 = byte & 0b0100_0000;
+            let bit_8 = byte & 0b1000_0000;
+
+            
+            
              // let bit_1 = byte & 0b1000_0000; // Shift
              // let bit_1 = byte & 0b0000_0001; // Shift
         }

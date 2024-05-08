@@ -59,25 +59,14 @@ impl PartialEq for BigU288 {
 impl Eq for BigU288 {}
 
 impl BigU288 {
-    pub fn add_msb(&mut self) {
+    pub fn add_msb(&mut self) -> &Self {
         // TODO: Important! Attempt to solve this in constant time
-        let mut i: bool = false; // Flag to see if we've hit the msb yet
-        for (i, byte) in self.0.iter().rev().enumerate() { // Enumerate backwards (msb first)
-            let bit_1 = byte & 0b0000_0001;
-            let bit_2 = byte & 0b0000_0010;
-            let bit_3 = byte & 0b0000_0100;
-            let bit_4 = byte & 0b0000_1000;
-            let bit_5 = byte & 0b0001_0000;
-            let bit_6 = byte & 0b0010_0000;
-            let bit_7 = byte & 0b0100_0000;
-            let bit_8 = byte & 0b1000_0000;
-
+        // First, convert bytes into bits
+        let mut bits = self.0.map(|byte| {[byte&1,byte&2,byte&4,byte&8,byte&16,byte&32,byte&64,byte&128]}).concat();
+        dbg!(&bits, &bits.len());
             
-            
-             // let bit_1 = byte & 0b1000_0000; // Shift
-             // let bit_1 = byte & 0b0000_0001; // Shift
-        }
-        todo!("msb isn't implemented yet");
+        // todo!("msb isn't implemented yet");
+        self
     }
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
@@ -133,6 +122,14 @@ mod tests {
     //         BigU288::from_hex()
     //     )
     // }
+    
+    #[test]
+    fn add_msb_1() {
+        assert_eq!(
+            *BigU288::from_hex("f").add_msb(),
+            BigU288::from_hex("1f")
+        );
+    }
 
     #[test]
     fn from_hex_2() {

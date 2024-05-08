@@ -63,33 +63,12 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
 
 fn init_state(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
     // Declare matrix (initialization isn't important, it will be overwritten anyways)
-    let mut state: [u32; 16] = [0; 16];
-
-    // First row: First 4 constants
-    state[0] = 0x61707865;
-    state[1] = 0x3320646e;
-    state[2] = 0x79622d32;
-    state[3] = 0x6b206574;
-
-    // Second row: Key blocks
-    state[4] = key[0];
-    state[5] = key[1];
-    state[6] = key[2];
-    state[7] = key[3];
-
-    // Third row: Key blocks continued
-    state[8] = key[4];
-    state[9] = key[5];
-    state[10] = key[6];
-    state[11] = key[7];
-
-    // Forth row: Block count and nonce
-    state[12] = counter;
-    state[13] = nonce[0];
-    state[14] = nonce[1];
-    state[15] = nonce[2];
-
-    state
+    [
+        0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
+        key[0], key[1], key[2], key[3],
+        key[4], key[5], key[6], key[7],
+        counter, nonce[0], nonce[1], nonce[2]
+    ]
 }
 
 fn quarter_round(state: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize) {

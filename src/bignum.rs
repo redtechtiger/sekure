@@ -61,6 +61,7 @@ impl BigU288 {
     pub fn add_msb(&mut self) -> &Self {
         // TODO: Important! Attempt to solve this in constant time
         // First, convert bytes into bits
+        let mut msb = true;
         let mut bits = self
             .0
             .map(|byte| {
@@ -76,6 +77,12 @@ impl BigU288 {
                 ]
             })
             .concat();
+        dbg!(&bits, &bits.len());
+        // Msb first!
+        for i in (0..bits.len()).rev() {
+            bits[i] |= bits.get(i.wrapping_sub(1)).unwrap_or(&1) & msb as u8;
+            msb = bits[i] == 0;
+        }
         dbg!(&bits, &bits.len());
 
         // todo!("msb isn't implemented yet");

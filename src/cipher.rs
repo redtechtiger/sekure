@@ -62,7 +62,6 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
 }
 
 fn init_state(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
-    // Declare matrix (initialization isn't important, it will be overwritten anyways)
     [
         0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,
         key[0], key[1], key[2], key[3],

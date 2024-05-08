@@ -59,7 +59,6 @@ impl Eq for BigU288 {}
 
 impl BigU288 {
     pub fn add_msb(&mut self) -> &Self {
-        // TODO: Important! Attempt to solve this in constant time
         // First, convert bytes into bits
         let mut msb = true;
         let mut bits = self
@@ -77,17 +76,18 @@ impl BigU288 {
                 ]
             })
             .concat();
-        dbg!(&bits, &bits.len());
+
         // Iterate over bits, msb first!
         for i in (0..bits.len()).rev() {
             bits[i] |= bits.get(i.wrapping_sub(1)).unwrap_or(&1) & msb as u8;
             msb = bits[i] == 0;
         }
-        dbg!(&bits, &bits.len());
 
         // Reconstruct new U288
+        for (i, bit) in bits.iter().enumerate() {
+            self.0[i / 8] |= bit << i % 8;
+        }
 
-        // todo!("msb isn't implemented yet");
         self
     }
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
@@ -132,10 +132,6 @@ fn pad_array_bigu288(input: &[u8]) -> [u8; 36] {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // #[test]
-    // fn add_msb_1() {
-    // }
 
     // #[test]
     // fn from_hex_1() {

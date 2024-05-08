@@ -61,6 +61,7 @@ pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
     add_states(init_state, working_state)
 }
 
+#[rustfmt::skip]
 fn init_state(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
     [
         0x61707865, 0x3320646e, 0x79622d32, 0x6b206574,

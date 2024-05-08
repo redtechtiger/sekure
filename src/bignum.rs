@@ -34,8 +34,7 @@ impl Mul for BigU288 {
                     + (*byte_self as u16 * *byte_other as u16))
                     .checked_sub(working_sum.0[i] as u16)
                     .unwrap_or(0);
-                working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] =
-                    (carry / 256) as u8;
+                working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] = (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
             total_sum = total_sum + working_sum;
@@ -62,9 +61,23 @@ impl BigU288 {
     pub fn add_msb(&mut self) -> &Self {
         // TODO: Important! Attempt to solve this in constant time
         // First, convert bytes into bits
-        let mut bits = self.0.map(|byte| {[byte&1,byte&2,byte&4,byte&8,byte&16,byte&32,byte&64,byte&128]}).concat();
+        let mut bits = self
+            .0
+            .map(|byte| {
+                [
+                    byte & 1,
+                    (byte & 2) >> 1,
+                    (byte & 4) >> 2,
+                    (byte & 8) >> 3,
+                    (byte & 16) >> 4,
+                    (byte & 32) >> 5,
+                    (byte & 64) >> 6,
+                    (byte & 128) >> 7,
+                ]
+            })
+            .concat();
         dbg!(&bits, &bits.len());
-            
+
         // todo!("msb isn't implemented yet");
         self
     }
@@ -122,13 +135,10 @@ mod tests {
     //         BigU288::from_hex()
     //     )
     // }
-    
+
     #[test]
     fn add_msb_1() {
-        assert_eq!(
-            *BigU288::from_hex("f").add_msb(),
-            BigU288::from_hex("1f")
-        );
+        assert_eq!(*BigU288::from_hex("f").add_msb(), BigU288::from_hex("1f"));
     }
 
     #[test]

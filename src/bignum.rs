@@ -58,38 +58,39 @@ impl PartialEq for BigU288 {
 impl Eq for BigU288 {}
 
 impl BigU288 {
-    pub fn add_msb(&mut self) -> &Self {
+    // THIS IMPLEMENTATION IS WRONG/UNNEEDED - SEE REFERENCE DOCS
+    // pub fn add_msb(&mut self) -> &Self {
         // First, convert bytes into bits
-        let mut msb = true;
-        let mut bits = self
-            .0
-            .map(|byte| {
-                [
-                    byte & 1,
-                    (byte & 2) >> 1,
-                    (byte & 4) >> 2,
-                    (byte & 8) >> 3,
-                    (byte & 16) >> 4,
-                    (byte & 32) >> 5,
-                    (byte & 64) >> 6,
-                    (byte & 128) >> 7,
-                ]
-            })
-            .concat();
+    //     let mut msb = true;
+    //    let mut bits = self
+    //        .0
+    //        .map(|byte| {
+    //            [
+    //                byte & 1,
+    //                (byte & 2) >> 1,
+    //                (byte & 4) >> 2,
+    //                (byte & 8) >> 3,
+    //                (byte & 16) >> 4,
+    //                (byte & 32) >> 5,
+    //                (byte & 64) >> 6,
+    //                (byte & 128) >> 7,
+    //            ]
+    //        })
+    //        .concat();
 
         // Iterate over bits, msb first!
-        for i in (0..bits.len()).rev() {
-            bits[i] |= bits.get(i.wrapping_sub(1)).unwrap_or(&1) & msb as u8;
-            msb = bits[i] == 0;
-        }
+    //    for i in (0..bits.len()).rev() {
+    //        bits[i] |= bits.get(i.wrapping_sub(1)).unwrap_or(&1) & msb as u8;
+    //        msb = bits[i] == 0;
+    //    }
 
         // Reconstruct new U288
-        for (i, bit) in bits.iter().enumerate() {
-            self.0[i / 8] |= bit << i % 8;
-        }
+    //    for (i, bit) in bits.iter().enumerate() {
+    //        self.0[i / 8] |= bit << i % 8;
+    //    }
 
-        self
-    }
+    //    self
+    // }
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
         big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();
@@ -141,9 +142,14 @@ mod tests {
     //     )
     // }
 
-    #[test]
+    // #[test]
     fn add_msb_1() {
         assert_eq!(*BigU288::from_hex("f").add_msb(), BigU288::from_hex("1f"));
+    }
+
+    #[test]
+    fn add_msb_2() {
+        assert_eq!(*BigU288::from_hex(""))
     }
 
     #[test]

@@ -11,7 +11,6 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
 
     for i in 0..msg.len().div_ceil(16) {
         // Iterate over every 16 byte block
-        // Do stuff (see reference RFC 7539, 2.5)
         let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
         n.add_msb();
         acc = acc + n;

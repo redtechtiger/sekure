@@ -245,4 +245,21 @@ mod tests {
             BigU288::from_slice(&[001, 255, 255, 254])
         );
     }
+
+    #[test]
+    fn multiply_3() {
+        assert_eq!(
+            BigU288::from_slice(&[255, 255, 255]) * BigU288::from_slice(&[255, 255, 255]),
+            BigU288::from_hex("fffffe000001")
+        );
+    }
+
+    #[test]
+    fn multiply_4() {
+        assert_eq!(
+            BigU288::from_slice(&[67,114,121,112,116,111,103,114,97,112,104,105,99,32,70]) 
+             * BigU288::from_slice(&[133,214,190,8,84,85,109,3,124,68,82,14,64,213,6,8]),
+            BigU288::from_hex("f")
+        );
+    }
 }

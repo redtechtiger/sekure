@@ -143,14 +143,14 @@ mod tests {
     // }
 
     // #[test]
-    fn add_msb_1() {
-        assert_eq!(*BigU288::from_hex("f").add_msb(), BigU288::from_hex("1f"));
-    }
+    // fn add_msb_1() {
+    //     assert_eq!(*BigU288::from_hex("f").add_msb(), BigU288::from_hex("1f"));
+    // }
 
-    #[test]
-    fn add_msb_2() {
-        assert_eq!(*BigU288::from_hex(""))
-    }
+    // #[test]
+    // fn add_msb_2() {
+    //     assert_eq!(*BigU288::from_hex(""))
+    // }
 
     #[test]
     fn from_hex_2() {

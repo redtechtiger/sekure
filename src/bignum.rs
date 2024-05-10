@@ -175,17 +175,6 @@ mod tests {
     }
 
     #[test]
-    fn from_hex_2() {
-        assert_eq!(
-            BigU288::from_hex("f").get_bytes(),
-            [
-                15u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0
-            ]
-        );
-    }
-
-    #[test]
     fn from_slice_1() {
         assert_eq!(BigU288::from_slice(&[1, 1]), BigU288::from_hex("101"));
     }

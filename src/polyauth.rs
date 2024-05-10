@@ -1,12 +1,12 @@
 use crate::bignum::BigU288;
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
-    let mut r = key[0..15].try_into().unwrap();
+    let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r); // TODO: Figure out if we can get rid of
                    // the ugly .try_into().unwrap()
     let r = BigU288::from_slice(&r);
     let s = &key[16..31];
-    let P = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // TODO: Fix this garbage
+    let p = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // TODO: Fix this garbage
     let mut acc = BigU288::new();
 
     for i in 0..msg.len().div_ceil(16) {
@@ -14,11 +14,11 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
         // n.add_msb(); // Find a way of fixing this!
         acc = acc + n;
-        acc = (acc * r) % P;
+        acc = (acc * r) % p;
     }
 
     acc = acc + BigU288::from_slice(s);
-    todo!();
+    // todo!();
     acc.get_bytes().to_vec()
 }
 

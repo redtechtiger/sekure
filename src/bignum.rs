@@ -1,7 +1,14 @@
 use std::ops::{Add, Mul, Rem};
+use std::fmt;
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
+
+impl fmt::Display for BigU288 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_hex())
+    }
+}
 
 impl Add for BigU288 {
     type Output = BigU288;
@@ -110,6 +117,13 @@ impl BigU288 {
         }
         big_u288
     }
+    pub fn to_hex(&self) -> String {
+        let mut out = String::new();
+        for byte in self.get_bytes().iter().rev() {
+            out += &format!("{:x}{:x}",byte>>4,byte&15);
+        }
+        out
+    }
     pub fn get_bytes(&self) -> [u8; 36] {
         self.0
     }
@@ -151,6 +165,14 @@ mod tests {
     // fn add_msb_2() {
     //     assert_eq!(*BigU288::from_hex(""))
     // }
+    
+    #[test]
+    fn to_hex_1() {
+        assert_eq!(
+            BigU288::from_hex("BABAFAFA").to_hex(),
+            "0000000000000000000000000000000000000000000000000000000000000000babafafa"
+        );
+    }
 
     #[test]
     fn from_hex_2() {

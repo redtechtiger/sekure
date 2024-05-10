@@ -175,6 +175,14 @@ mod tests {
     }
 
     #[test]
+    fn to_hex_2() {
+        assert_eq!(
+            BigU288::from_hex("3fffffffffffffffffffffffffffffffb").to_hex(),
+            "0000000000000000000000000000000000000003fffffffffffffffffffffffffffffffb"
+        );
+    }
+
+    #[test]
     fn from_slice_1() {
         assert_eq!(BigU288::from_slice(&[1, 1]), BigU288::from_hex("101"));
     }

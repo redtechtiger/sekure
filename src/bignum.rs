@@ -1,5 +1,5 @@
-use std::ops::{Add, Mul, Rem};
 use std::fmt;
+use std::ops::{Add, Mul, Rem};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -21,7 +21,7 @@ impl Add for BigU288 {
             *byte = (sum % 256) as u8;
             carry = sum / 256;
         }
-        if carry>0 {
+        if carry > 0 {
             panic!("overflow");
         }
         output
@@ -63,7 +63,6 @@ impl PartialEq for BigU288 {
 impl Eq for BigU288 {}
 
 impl BigU288 {
-    
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
         big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();
@@ -86,7 +85,7 @@ impl BigU288 {
     pub fn to_hex(&self) -> String {
         let mut out = String::new();
         for byte in self.get_bytes().iter().rev() {
-            out += &format!("{:x}{:x}",byte>>4,byte&15);
+            out += &format!("{:x}{:x}", byte >> 4, byte & 15);
         }
         out
     }
@@ -121,7 +120,7 @@ mod tests {
     //         BigU288::from_hex()
     //     )
     // }
-    
+
     #[test]
     fn to_hex_1() {
         assert_eq!(
@@ -196,8 +195,7 @@ mod tests {
     #[test]
     fn add_3() {
         assert_eq!(
-            BigU288::from_slice(&[0, 255, 255])
-            + BigU288::from_slice(&[255, 255, 0]),
+            BigU288::from_slice(&[0, 255, 255]) + BigU288::from_slice(&[255, 255, 0]),
             BigU288::from_slice(&[255, 254, 0, 1])
         );
     }
@@ -241,8 +239,11 @@ mod tests {
     #[test]
     fn multiply_4() {
         assert_eq!(
-            BigU288::from_slice(&[67,114,121,112,116,111,103,114,97,112,104,105,99,32,70]) 
-             * BigU288::from_slice(&[133,214,190,8,84,85,109,3,124,68,82,14,64,213,6,8]),
+            BigU288::from_slice(&[
+                67, 114, 121, 112, 116, 111, 103, 114, 97, 112, 104, 105, 99, 32, 70
+            ]) * BigU288::from_slice(&[
+                133, 214, 190, 8, 84, 85, 109, 3, 124, 68, 82, 14, 64, 213, 6, 8
+            ]),
             BigU288::from_hex("232e2481e77d27fa798895e14ee9e0f2779453994ac90ed284034da565ecf")
         );
     }
@@ -250,8 +251,7 @@ mod tests {
     #[test]
     fn multiply_5() {
         assert_eq!(
-            BigU288::from_slice(&[255,255])
-            * BigU288::from_slice(&[0,1]),
+            BigU288::from_slice(&[255, 255]) * BigU288::from_slice(&[0, 1]),
             BigU288::from_slice(&[0, 255, 255])
         );
     }

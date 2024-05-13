@@ -41,6 +41,9 @@ impl Mul for BigU288 {
                 *byte_other = (product % 256) as u8;
                 carry = product / 256;
             }
+            if carry > 0 {
+                panic!("overflow");
+            }
             working_sum.0.rotate_right(i);
             total_sum = total_sum + working_sum;
         }

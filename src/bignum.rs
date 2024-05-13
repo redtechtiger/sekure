@@ -13,15 +13,13 @@ impl fmt::Display for BigU288 {
 impl Add for BigU288 {
     type Output = BigU288;
     fn add(self, other: Self) -> Self::Output {
-        let mut output = BigU288::new();
-        for (i, byte) in self.0.iter().enumerate() {
+        let mut output = self;
+        let mut carry = 0;
+        for (i, byte) in output.0.iter_mut().enumerate() {
             // LSB first
-            let original_result_byte = output.0[i];
-            output.0[i] += byte.wrapping_add(other.0[i]);
-            let carry = (*byte as u16 + other.0[i] as u16 + original_result_byte as u16)
-                .checked_sub(output.0[i] as u16)
-                .unwrap_or(0);
-            output.0[std::cmp::min(i + 1, output.0.len() - 1)] = (carry / 256) as u8;
+            let sum: u64 = *byte as u64 + other.0[i] as u64 + carry as u64;
+            *byte = (sum % 256) as u8;
+            carry = sum / 256;
         }
         output
     }
@@ -36,7 +34,7 @@ impl Mul for BigU288 {
             let mut working_sum = BigU288::new();
             println!("Multiplying {:?} by {}...", other.0, byte_self);
             for (i, byte_other) in other.0.iter().enumerate() {
-                println!("Inner loop iterate: Current working state: {:?}",working_sum.0);
+                println!("Inner loop iterate: Current working state: {:?}, multiplying on {}",working_sum.0,byte_other);
                 let original_working_byte = working_sum.0[i];
                 working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
                 let carry = (original_working_byte as u16
@@ -46,6 +44,7 @@ impl Mul for BigU288 {
                 working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] = (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
+            println!("Outer loop end, adding {:?} to {:?}", working_sum, total_sum);
             total_sum = total_sum + working_sum;
         }
         total_sum
@@ -157,16 +156,6 @@ mod tests {
     //         BigU288::from_hex()
     //     )
     // }
-
-    // #[test]
-    // fn add_msb_1() {
-    //     assert_eq!(*BigU288::from_hex("f").add_msb(), BigU288::from_hex("1f"));
-    // }
-
-    // #[test]
-    // fn add_msb_2() {
-    //     assert_eq!(*BigU288::from_hex(""))
-    // }
     
     #[test]
     fn to_hex_1() {
@@ -236,6 +225,15 @@ mod tests {
             BigU288::from_hex("C1583054D5A6350B37E23A")
                 + BigU288::from_hex("2A677ACE04C0037CA98B6BC"),
             BigU288::from_hex("367cfdd3521a66cd5d098f6")
+        );
+    }
+
+    #[test]
+    fn add_3() {
+        assert_eq!(
+            BigU288::from_slice(&[0, 255, 255])
+            + BigU288::from_slice(&[255, 255, 0]),
+            BigU288::from_slice(&[255, 254, 0, 1])
         );
     }
 

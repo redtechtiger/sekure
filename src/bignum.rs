@@ -69,39 +69,7 @@ impl PartialEq for BigU288 {
 impl Eq for BigU288 {}
 
 impl BigU288 {
-    // THIS IMPLEMENTATION IS WRONG/UNNEEDED - SEE REFERENCE DOCS
-    // pub fn add_msb(&mut self) -> &Self {
-        // First, convert bytes into bits
-    //     let mut msb = true;
-    //    let mut bits = self
-    //        .0
-    //        .map(|byte| {
-    //            [
-    //                byte & 1,
-    //                (byte & 2) >> 1,
-    //                (byte & 4) >> 2,
-    //                (byte & 8) >> 3,
-    //                (byte & 16) >> 4,
-    //                (byte & 32) >> 5,
-    //                (byte & 64) >> 6,
-    //                (byte & 128) >> 7,
-    //            ]
-    //        })
-    //        .concat();
-
-        // Iterate over bits, msb first!
-    //    for i in (0..bits.len()).rev() {
-    //        bits[i] |= bits.get(i.wrapping_sub(1)).unwrap_or(&1) & msb as u8;
-    //        msb = bits[i] == 0;
-    //    }
-
-        // Reconstruct new U288
-    //    for (i, bit) in bits.iter().enumerate() {
-    //        self.0[i / 8] |= bit << i % 8;
-    //    }
-
-    //    self
-    // }
+    
     pub fn from_slice(bytes: &[u8]) -> BigU288 {
         let mut big_u288 = BigU288::new();
         big_u288.0 = pad_array_bigu288(bytes).as_slice().try_into().unwrap();

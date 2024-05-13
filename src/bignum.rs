@@ -21,6 +21,9 @@ impl Add for BigU288 {
             *byte = (sum % 256) as u8;
             carry = sum / 256;
         }
+        if carry>0 {
+            panic!("overflow");
+        }
         output
     }
 }

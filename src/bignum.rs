@@ -36,23 +36,12 @@ impl Mul for BigU288 {
             // Multiply entire second number by each byte in self
             let mut working_sum = other;
             let mut carry = 0;
-            println!("Multiplying {:?} by {}...", other.0, byte_self);
             for (i, byte_other) in working_sum.0.iter_mut().enumerate() {
-                // println!("Inner loop iterate: Current working state: {:?}, multiplying on {}",working_sum.0,byte_other);
                 let product = *byte_other as u64 * *byte_self as u64 + carry as u64;
                 *byte_other = (product % 256) as u8;
                 carry = product / 256;
-
-                // let original_working_byte = working_sum.0[i];
-                // working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
-                // let carry = (original_working_byte as u16
-                //     + (*byte_self as u16 * *byte_other as u16))
-                //     .checked_sub(working_sum.0[i] as u16)
-                //     .unwrap_or(0);
-                // working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] = (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
-            println!("Outer loop end, adding {:?} to {:?}", working_sum, total_sum);
             total_sum = total_sum + working_sum;
         }
         total_sum
@@ -251,8 +240,6 @@ mod tests {
 
     #[test]
     fn multiply_4() {
-        println!("{}", BigU288::from_slice(&[67,114,121,112,116,111,103,114,97,112,104,105,99,32,70]));
-        println!("{}", BigU288::from_slice(&[133,214,190,8,84,85,109,3,124,68,82,14,64,213,6,8]));
         assert_eq!(
             BigU288::from_slice(&[67,114,121,112,116,111,103,114,97,112,104,105,99,32,70]) 
              * BigU288::from_slice(&[133,214,190,8,84,85,109,3,124,68,82,14,64,213,6,8]),

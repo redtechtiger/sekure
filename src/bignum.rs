@@ -34,10 +34,15 @@ impl Mul for BigU288 {
         let mut total_sum = BigU288::new();
         for (i, byte_self) in self.0.iter().enumerate() {
             // Multiply entire second number by each byte in self
-            let mut working_sum = BigU288::new();
+            let mut working_sum = other;
+            let mut carry = 0;
             println!("Multiplying {:?} by {}...", other.0, byte_self);
-            for (i, byte_other) in other.0.iter().enumerate() {
-                println!("Inner loop iterate: Current working state: {:?}, multiplying on {}",working_sum.0,byte_other);
+            for (i, byte_other) in working_sum.0.iter_mut().enumerate() {
+                // println!("Inner loop iterate: Current working state: {:?}, multiplying on {}",working_sum.0,byte_other);
+                let product = *byte_other as u64 * *byte_self as u64 + carry as u64;
+                *byte_other = (product % 256) as u8;
+                carry = product / 256;
+
                 // let original_working_byte = working_sum.0[i];
                 // working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
                 // let carry = (original_working_byte as u16
@@ -257,7 +262,7 @@ mod tests {
     fn multiply_5() {
         assert_eq!(
             BigU288::from_slice(&[255,255])
-            * BigU288::from_slice(&[1,1]),
+            * BigU288::from_slice(&[0,1]),
             BigU288::from_slice(&[0, 255, 255])
         );
     }

@@ -35,13 +35,13 @@ impl Mul for BigU288 {
             println!("Multiplying {:?} by {}...", other.0, byte_self);
             for (i, byte_other) in other.0.iter().enumerate() {
                 println!("Inner loop iterate: Current working state: {:?}, multiplying on {}",working_sum.0,byte_other);
-                let original_working_byte = working_sum.0[i];
-                working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
-                let carry = (original_working_byte as u16
-                    + (*byte_self as u16 * *byte_other as u16))
-                    .checked_sub(working_sum.0[i] as u16)
-                    .unwrap_or(0);
-                working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] = (carry / 256) as u8;
+                // let original_working_byte = working_sum.0[i];
+                // working_sum.0[i] += byte_self.wrapping_mul(*byte_other);
+                // let carry = (original_working_byte as u16
+                //     + (*byte_self as u16 * *byte_other as u16))
+                //     .checked_sub(working_sum.0[i] as u16)
+                //     .unwrap_or(0);
+                // working_sum.0[std::cmp::min(i + 1, working_sum.0.len() - 1)] = (carry / 256) as u8;
             }
             working_sum.0.rotate_right(i);
             println!("Outer loop end, adding {:?} to {:?}", working_sum, total_sum);

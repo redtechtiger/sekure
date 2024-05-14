@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Add, Sub, Mul, Rem};
+use std::ops::{Add, Mul, Rem, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -240,6 +240,20 @@ mod tests {
         assert_eq!(
             BigU288::from_slice(&[0, 255]) - BigU288::from_slice(&[255, 0]),
             BigU288::from_slice(&[1, 254])
+        );
+    }
+
+    #[test]
+    fn sub_3() {
+        assert_eq!(
+            BigU288::from_hex(
+                "f40d1ebbd170aa4d28a333d8b12a27a70535f29f3e841e5655201f4ef7f31afc36ec06be"
+            ) - BigU288::from_hex(
+                "546030bdb669182f46cecd7a76c9ebb8249caa348f243cdce2a692ad90e9b15fe4f29116"
+            ),
+            BigU288::from_hex(
+                "9facedfe1b07921de1d4665e3a603beee099486aaf5fe17972798ca16709699c51f975a8"
+            )
         );
     }
 

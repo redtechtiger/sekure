@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Add, Mul, Rem};
+use std::ops::{Add, Sub, Mul, Rem};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -20,6 +20,23 @@ impl Add for BigU288 {
             let sum: u64 = *byte as u64 + other.0[i] as u64 + carry as u64;
             *byte = (sum % 256) as u8;
             carry = sum / 256;
+        }
+        if carry > 0 {
+            panic!("overflow");
+        }
+        output
+    }
+}
+
+impl Sub for BigU288 {
+    type Output = BigU288;
+    fn sub(self, other: Self) -> Self::Output {
+        let mut output = self;
+        let mut carry = 0;
+        for (i, byte) in output.0.iter_mut().enumerate() {
+            let difference: i64 = *byte as i64 - other.0[i] as i64 - carry as i64;
+            *byte = ((difference + 256) % 256) as u8;
+            carry = difference.is_negative() as u8;
         }
         if carry > 0 {
             panic!("overflow");
@@ -51,10 +68,17 @@ impl Mul for BigU288 {
     }
 }
 
+// This is slow. TODO: Look into implementing a more performant algorithm!
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
-        todo!("implement modulo");
+        // let mut quotient = BigU288::new();
+        // let mut numerator = self;
+        // while numerator<0 {
+        //     numerator = numerator - other;
+        // }
+
+        todo!("rem not implemented");
     }
 }
 
@@ -200,6 +224,22 @@ mod tests {
         assert_eq!(
             BigU288::from_slice(&[0, 255, 255]) + BigU288::from_slice(&[255, 255, 0]),
             BigU288::from_slice(&[255, 254, 0, 1])
+        );
+    }
+
+    #[test]
+    fn sub_1() {
+        assert_eq!(
+            BigU288::from_hex("ff") - BigU288::from_hex("0f"),
+            BigU288::from_hex("f0")
+        );
+    }
+
+    #[test]
+    fn sub_2() {
+        assert_eq!(
+            BigU288::from_slice(&[0, 255]) - BigU288::from_slice(&[255, 0]),
+            BigU288::from_slice(&[1, 254])
         );
     }
 

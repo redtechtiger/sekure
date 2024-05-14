@@ -104,7 +104,7 @@ impl PartialOrd<BigU288> for BigU288 {
     fn lt(&self, other: &Self) -> bool {
         let mut lt = 0;
         for (i, byte_self) in self.0.iter().enumerate() {
-            lt = (*byte_self < other.0[i]) as u8 | (lt&*byte_self==other.0[i]) as u8;
+            lt = (*byte_self < other.0[i]) as u8 | (lt & (*byte_self==other.0[i]) as u8) as u8;
         }
         lt == 1
     }
@@ -191,6 +191,22 @@ mod tests {
         assert_eq!(
             BigU288::from_hex("f0") < BigU288::from_hex("ff"),
             true
+        );
+    }
+
+    #[test]
+    fn less_than_2() {
+        assert_eq!(
+            BigU288::from_slice(&[0, 255, 0]) < BigU288::from_slice(&[255, 0, 255]),
+            true
+        );
+    }
+
+    #[test]
+    fn less_than_3() {
+        assert_eq!(
+            BigU288::from_hex("ffffff") < BigU288::from_hex("ffffff"),
+            false
         );
     }
  

@@ -123,8 +123,11 @@ impl PartialOrd<BigU288> for BigU288 {
         le == 1
     }
     fn ge(&self, other: &Self) ->  bool {
-        let mut ge = 0;
-        todo!("implement ge");
+        let mut ge = 1;
+        for (i, byte_self) in self.0.iter().enumerate() {
+            ge = (*byte_self > other.0[i]) as u8 | (ge & (*byte_self==other.0[i]) as u8) as u8;
+        }
+        ge == 1
     }
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         todo!("implement partialcmp");
@@ -276,6 +279,31 @@ mod tests {
     fn less_than_or_equal_3() {
         assert_eq!(
             BigU288::from_hex("fff") <= BigU288::from_hex("ffe"),
+            false
+        );
+    }
+
+    #[test]
+    fn greater_than_or_equal_1() {
+        assert_eq!(
+            BigU288::from_hex("fff") >= BigU288::from_hex("fff"),
+            true
+        );
+    }
+ 
+    #[test]
+    fn greater_than_or_equal_2() {
+        assert_eq!(
+            BigU288::from_hex("fff") >= BigU288::from_hex("f5f"),
+            true
+        );
+    }
+
+ 
+    #[test]
+    fn greater_than_or_equal_3() {
+        assert_eq!(
+            BigU288::from_hex("fff") >= BigU288::from_hex("f8fff"),
             false
         );
     }

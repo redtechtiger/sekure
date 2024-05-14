@@ -82,9 +82,9 @@ impl Rem for BigU288 {
     }
 }
 
-// I don't actually know if a simple == is constant time, but to be on the same side I implemented
+// I don't actually know if a simple == is constant time, but to be on the safe side I implemented
 // a constant time loop.
-impl PartialEq for BigU288 {
+impl PartialEq<BigU288> for BigU288 {
     fn eq(&self, other: &BigU288) -> bool {
         let mut equal = 1;
         for (i, byte_self) in self.0.iter().enumerate() {
@@ -93,6 +93,38 @@ impl PartialEq for BigU288 {
         equal == 1
     }
 }
+
+// impl PartialEq<u8> for BigU288 {
+//     fn eq(&self, other: &u8) -> bool {
+//         self.0[0] == *other
+//     }
+// }
+
+impl PartialOrd<BigU288> for BigU288 {
+    fn lt(&self, other: &Self) -> bool {
+        let mut lt = 0;
+        for (i, byte_self) in self.0.iter().enumerate() {
+            lt = (*byte_self < other.0[i]) as u8 | (lt&*byte_self==other.0[i]) as u8;
+        }
+        lt == 1
+    }
+    fn gt(&self, other: &Self) -> bool {
+        let mut gt = 0;
+        todo!("implement gt");
+    }
+    fn le(&self, other: &Self) -> bool {
+        let mut le = 0;
+        todo!("implement le");
+    }
+    fn ge(&self, other: &Self) ->  bool {
+        let mut ge = 0;
+        todo!("implement ge");
+    }
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        todo!("implement partialcmp");
+    }
+}
+
 impl Eq for BigU288 {}
 
 impl BigU288 {
@@ -154,6 +186,14 @@ mod tests {
     //     )
     // }
 
+    #[test]
+    fn less_than_1() {
+        assert_eq!(
+            BigU288::from_hex("f0") < BigU288::from_hex("ff"),
+            true
+        );
+    }
+ 
     #[test]
     fn to_hex_1() {
         assert_eq!(

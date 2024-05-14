@@ -36,7 +36,7 @@ impl Mul for BigU288 {
             // Multiply entire second number by each byte in self
             let mut working_sum = other;
             let mut carry = 0;
-            for (i, byte_other) in working_sum.0.iter_mut().enumerate() {
+            for byte_other in working_sum.0.iter_mut() {
                 let product = *byte_other as u64 * *byte_self as u64 + carry as u64;
                 *byte_other = (product % 256) as u8;
                 carry = product / 256;

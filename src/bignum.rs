@@ -82,9 +82,15 @@ impl Rem for BigU288 {
     }
 }
 
+// I don't actually know if a simple == is constant time, but to be on the same side I implemented
+// a constant time loop.
 impl PartialEq for BigU288 {
     fn eq(&self, other: &BigU288) -> bool {
-        self.0 == other.0
+        let mut equal = 1;
+        for (i, byte_self) in self.0.iter().enumerate() {
+            equal &= (*byte_self == other.0[i]) as u8;
+        }
+        equal == 1
     }
 }
 impl Eq for BigU288 {}

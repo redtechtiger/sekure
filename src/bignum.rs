@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Add, Mul, Rem, Sub};
+use std::ops::{Add, Mul, Rem, Div, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -72,13 +72,23 @@ impl Mul for BigU288 {
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
-        // let mut quotient = BigU288::new();
-        // let mut numerator = self;
-        // while numerator<0 {
-        //     numerator = numerator - other;
-        // }
-
-        todo!("rem not implemented");
+        let mut numerator = self;
+        while numerator>other { // bigu288::new() is equal to 0
+            numerator = numerator - other;
+        }
+        numerator // Remainder
+    }
+}
+impl Div for BigU288 {
+    type Output = BigU288;
+    fn div(self, other: Self) -> Self::Output {
+        let mut quotient = BigU288::new();
+        let mut numerator = self;
+        while numerator>=other { // bigu288::new() is equal to 0
+            numerator = numerator - other;
+            quotient = quotient + BigU288::from_hex("1");
+        }
+        quotient
     }
 }
 
@@ -305,6 +315,21 @@ mod tests {
         assert_eq!(
             BigU288::from_hex("fff") >= BigU288::from_hex("f8fff"),
             false
+        );
+    }
+
+    #[test]
+    fn division_1() {
+        assert_eq!(
+            BigU288::from_hex("a") / BigU288::from_hex("2"),
+            BigU288::from_hex("5")
+        );
+    }
+
+    #[test]
+    fn division() {
+        assert_eq!(
+
         );
     }
  

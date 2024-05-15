@@ -329,10 +329,18 @@ mod tests {
     }
 
     #[test]
-    fn division() {
+    fn division_2() {
         assert_eq!(
-            BigU288::from_hex() / BigU288::from_hex(),
-            BigU288_
+            BigU288::from_hex("f") / BigU288::from_hex("4"),
+            BigU288::from_hex("3")
+        );
+    }
+
+    #[test]
+    fn division_3() {
+        assert_eq!(
+            BigU288::from_hex("e") / BigU288::from_hex("10"),
+            BigU288::from_hex("0")
         );
     }
  

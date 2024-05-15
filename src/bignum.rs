@@ -74,7 +74,7 @@ impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
         let mut numerator = self;
-        while numerator > other {
+        while numerator >= other {
             // bigu288::new() is equal to 0
             numerator = numerator - other;
         }
@@ -323,6 +323,38 @@ mod tests {
     fn division_3() {
         assert_eq!(
             BigU288::from_hex("e") / BigU288::from_hex("10"),
+            BigU288::from_hex("0")
+        );
+    }
+
+    #[test]
+    fn remainder_1() {
+        assert_eq!(
+            BigU288::from_hex("a") % BigU288::from_hex("3"),
+            BigU288::from_hex("1")
+        );
+    }
+
+    #[test]
+    fn remainder_2() {
+        assert_eq!(
+            BigU288::from_hex("5") % BigU288::from_hex("3"),
+            BigU288::from_hex("2")
+        );
+    }
+
+    #[test]
+    fn remainder_3() {
+        assert_eq!(
+            BigU288::from_hex("f6") % BigU288::from_hex("74e"),
+            BigU288::from_hex("f6")
+        );
+    }
+
+    #[test]
+    fn remainder_4() {
+        assert_eq!(
+            BigU288::from_hex("fff123") % BigU288::from_hex("fff123"),
             BigU288::from_hex("0")
         );
     }

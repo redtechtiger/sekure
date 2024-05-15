@@ -69,6 +69,7 @@ impl Mul for BigU288 {
 }
 
 // This is slow. TODO: Look into implementing a more performant algorithm!
+// TODO: Do this in constant time!
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
@@ -79,6 +80,7 @@ impl Rem for BigU288 {
         numerator // Remainder
     }
 }
+// TODO: Do this in constant time!
 impl Div for BigU288 {
     type Output = BigU288;
     fn div(self, other: Self) -> Self::Output {
@@ -329,7 +331,8 @@ mod tests {
     #[test]
     fn division() {
         assert_eq!(
-
+            BigU288::from_hex() / BigU288::from_hex(),
+            BigU288_
         );
     }
  

@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Add, Mul, Rem, Div, Sub};
+use std::ops::{Add, Div, Mul, Rem, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -74,7 +74,8 @@ impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
         let mut numerator = self;
-        while numerator>other { // bigu288::new() is equal to 0
+        while numerator > other {
+            // bigu288::new() is equal to 0
             numerator = numerator - other;
         }
         numerator // Remainder
@@ -86,7 +87,8 @@ impl Div for BigU288 {
     fn div(self, other: Self) -> Self::Output {
         let mut quotient = BigU288::new();
         let mut numerator = self;
-        while numerator>=other { // bigu288::new() is equal to 0
+        while numerator >= other {
+            // bigu288::new() is equal to 0
             numerator = numerator - other;
             quotient = quotient + BigU288::from_hex("1");
         }
@@ -116,28 +118,28 @@ impl PartialOrd<BigU288> for BigU288 {
     fn lt(&self, other: &Self) -> bool {
         let mut lt = 0;
         for (i, byte_self) in self.0.iter().enumerate() {
-            lt = (*byte_self < other.0[i]) as u8 | (lt & (*byte_self==other.0[i]) as u8) as u8;
+            lt = (*byte_self < other.0[i]) as u8 | (lt & (*byte_self == other.0[i]) as u8) as u8;
         }
         lt == 1
     }
     fn gt(&self, other: &Self) -> bool {
         let mut gt = 0;
         for (i, byte_self) in self.0.iter().enumerate() {
-            gt = (*byte_self > other.0[i]) as u8 | (gt & (*byte_self==other.0[i]) as u8) as u8;
+            gt = (*byte_self > other.0[i]) as u8 | (gt & (*byte_self == other.0[i]) as u8) as u8;
         }
         gt == 1
     }
     fn le(&self, other: &Self) -> bool {
         let mut le = 1;
         for (i, byte_self) in self.0.iter().enumerate() {
-            le = (*byte_self < other.0[i]) as u8 | (le & (*byte_self==other.0[i]) as u8) as u8;
+            le = (*byte_self < other.0[i]) as u8 | (le & (*byte_self == other.0[i]) as u8) as u8;
         }
         le == 1
     }
-    fn ge(&self, other: &Self) ->  bool {
+    fn ge(&self, other: &Self) -> bool {
         let mut ge = 1;
         for (i, byte_self) in self.0.iter().enumerate() {
-            ge = (*byte_self > other.0[i]) as u8 | (ge & (*byte_self==other.0[i]) as u8) as u8;
+            ge = (*byte_self > other.0[i]) as u8 | (ge & (*byte_self == other.0[i]) as u8) as u8;
         }
         ge == 1
     }
@@ -209,10 +211,7 @@ mod tests {
 
     #[test]
     fn less_than_1() {
-        assert_eq!(
-            BigU288::from_hex("f0") < BigU288::from_hex("ff"),
-            true
-        );
+        assert_eq!(BigU288::from_hex("f0") < BigU288::from_hex("ff"), true);
     }
 
     #[test]
@@ -233,10 +232,7 @@ mod tests {
 
     #[test]
     fn less_than_4() {
-        assert_eq!(
-            BigU288::from_hex("a0b5") < BigU288::from_hex("a0b5"),
-            false
-        );
+        assert_eq!(BigU288::from_hex("a0b5") < BigU288::from_hex("a0b5"), false);
     }
 
     #[test]
@@ -258,17 +254,14 @@ mod tests {
     #[test]
     fn greater_than_3() {
         assert_eq!(
-            BigU288::from_slice(&[255, 0, 255]) > BigU288::from_slice(&[0,0,255,255]),
+            BigU288::from_slice(&[255, 0, 255]) > BigU288::from_slice(&[0, 0, 255, 255]),
             false
         );
     }
 
     #[test]
     fn greater_than_4() {
-        assert_eq!(
-            BigU288::from_hex("8f27") > BigU288::from_hex("8f27"),
-            false
-        );
+        assert_eq!(BigU288::from_hex("8f27") > BigU288::from_hex("8f27"), false);
     }
 
     #[test]
@@ -289,29 +282,19 @@ mod tests {
 
     #[test]
     fn less_than_or_equal_3() {
-        assert_eq!(
-            BigU288::from_hex("fff") <= BigU288::from_hex("ffe"),
-            false
-        );
+        assert_eq!(BigU288::from_hex("fff") <= BigU288::from_hex("ffe"), false);
     }
 
     #[test]
     fn greater_than_or_equal_1() {
-        assert_eq!(
-            BigU288::from_hex("fff") >= BigU288::from_hex("fff"),
-            true
-        );
-    }
- 
-    #[test]
-    fn greater_than_or_equal_2() {
-        assert_eq!(
-            BigU288::from_hex("fff") >= BigU288::from_hex("f5f"),
-            true
-        );
+        assert_eq!(BigU288::from_hex("fff") >= BigU288::from_hex("fff"), true);
     }
 
- 
+    #[test]
+    fn greater_than_or_equal_2() {
+        assert_eq!(BigU288::from_hex("fff") >= BigU288::from_hex("f5f"), true);
+    }
+
     #[test]
     fn greater_than_or_equal_3() {
         assert_eq!(
@@ -343,7 +326,7 @@ mod tests {
             BigU288::from_hex("0")
         );
     }
- 
+
     #[test]
     fn to_hex_1() {
         assert_eq!(

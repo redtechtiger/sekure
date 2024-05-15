@@ -77,6 +77,7 @@ impl Rem for BigU288 {
         while numerator >= other {
             // bigu288::new() is equal to 0
             numerator = numerator - other;
+            dbg!(numerator);
         }
         numerator // Remainder
     }

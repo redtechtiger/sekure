@@ -10,13 +10,17 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut acc = BigU288::new();
 
     for i in 0..msg.len().div_ceil(16) {
+        dbg!(i);
         // Iterate over every 16 byte block
         let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
         dbg!(n.get_bytes());
         // n.add_msb(); // Find a way of fixing this!
         acc = acc + n;
         dbg!(r.get_bytes());
+        dbg!(acc*r);
+        dbg!((acc*r)%p);
         acc = (acc * r) % p;
+        dbg!(acc.get_bytes());
     }
 
     acc = acc + BigU288::from_slice(s);
@@ -60,14 +64,14 @@ mod tests {
 
     #[test]
     fn generate_1() {
-        // generate(
-        //     b"Cryptographic Forum Research Group",
-        //     [
-        //         0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5,
-        //         0x06, 0xa8, 0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd, 0x4a, 0xbf, 0xf6, 0xaf,
-        //         0x41, 0x49, 0xf5, 0x1b,
-        //     ],
-        // );
-        // todo!("test isn't done, nor is the implementation, panic so that we can see debug log");
+        generate(
+            b"Cryptographic Forum Research Group",
+            [
+                0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5,
+                0x06, 0xa8, 0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd, 0x4a, 0xbf, 0xf6, 0xaf,
+                0x41, 0x49, 0xf5, 0x1b,
+            ],
+        );
+        todo!("test isn't done, nor is the implementation, panic so that we can see debug log");
     }
 }

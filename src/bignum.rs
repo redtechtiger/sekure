@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Add, Div, Mul, Rem, Sub};
+use std::ops::{Add, Div, Mul, Rem, Shl, Shr, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct BigU288([u8; 36]); // 288 bit unsigned integer (8x36)
@@ -65,6 +65,22 @@ impl Mul for BigU288 {
             total_sum = total_sum + working_sum;
         }
         total_sum
+    }
+}
+
+impl Shl for BigU288 {
+    type Output = BigU288;
+    fn shl(self, other: Self) -> Self::Output {
+
+        todo!();
+    }
+}
+
+impl Shr for BigU288 {
+    type Output = BigU288;
+    fn shr(self,other: Self) -> Self::Output {
+        
+        todo!();
     }
 }
 

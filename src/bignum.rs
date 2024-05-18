@@ -71,8 +71,16 @@ impl Mul for BigU288 {
 impl Shl for BigU288 {
     type Output = BigU288;
     fn shl(self, other: Self) -> Self::Output {
-
-        todo!();
+        let mut output = self;
+        let mut i = BigU288::new(); // initializes to 0
+        while other > i {
+            for j in 1..self.0.len()-1 {
+                output.0[j-1] = self.0[j];
+            }
+            output.0[output.0.len()-1] = 0;
+            i = i + BigU288::from_hex("1"); // Increment
+        }
+        output
     }
 }
 

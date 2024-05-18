@@ -68,6 +68,7 @@ impl Mul for BigU288 {
     }
 }
 
+// NOTE: This shifts in base 256
 impl Shl for BigU288 {
     type Output = BigU288;
     fn shl(self, other: Self) -> Self::Output {
@@ -84,6 +85,7 @@ impl Shl for BigU288 {
     }
 }
 
+// NOTE: This shifts in base 256
 impl Shr for BigU288 {
     type Output = BigU288;
     fn shr(self,other: Self) -> Self::Output {

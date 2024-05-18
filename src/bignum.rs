@@ -75,10 +75,11 @@ impl Shl for BigU288 {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
         while other > i {
-            for j in 1..self.0.len()-1 {
-                output.0[j-1] = self.0[j];
+            for j in 0..self.0.len()-1 {
+                dbg!(output);
+                output.0[j+1] = self.0[j];
             }
-            output.0[output.0.len()-1] = 0;
+            output.0[0] = 0;
             i = i + BigU288::from_hex("1"); // Increment
         }
         output
@@ -241,7 +242,7 @@ mod tests {
         dbg!(8 << 1);
         assert_eq!(
             BigU288::from_slice(&[255, 0]) << BigU288::from_hex("1"),
-            BigU288::from_slice(&[255, 0, 0])
+            BigU288::from_slice(&[0, 255, 0]) // Looks funky because data is little endian
         );
     }
 

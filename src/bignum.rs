@@ -248,10 +248,17 @@ mod tests {
 
     #[test]
     fn left_shift_1() {
-        dbg!(8 << 1);
         assert_eq!(
             BigU288::from_slice(&[255, 0]) << BigU288::from_hex("1"),
             BigU288::from_slice(&[0, 255, 0]) // Looks funky because data is little endian
+        );
+    }
+
+    #[test]
+    fn right_shift_1() {
+        assert_eq!(
+            BigU288::from_slice(&[255, 0]) >> BigU288::from_hex("1"),
+            BigU288::from_slice(&[0]) // Looks funky because data is little endian
         );
     }
 

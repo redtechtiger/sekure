@@ -237,6 +237,15 @@ mod tests {
     // }
 
     #[test]
+    fn left_shift_1() {
+        dbg!(8 << 1);
+        assert_eq!(
+            BigU288::from_slice(&[255, 0]) << BigU288::from_hex("1"),
+            BigU288::from_slice(&[255, 0, 0])
+        );
+    }
+
+    #[test]
     fn less_than_1() {
         assert_eq!(BigU288::from_hex("f0") < BigU288::from_hex("ff"), true);
     }

@@ -17,8 +17,8 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         // n.add_msb(); // Find a way of fixing this!
         acc = acc + n;
         dbg!(r.get_bytes());
-        dbg!(acc*r);
-        dbg!((acc*r)%p);
+        dbg!(acc * r);
+        dbg!((acc * r) % p);
         acc = (acc * r) % p;
         dbg!(acc.get_bytes());
     }

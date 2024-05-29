@@ -75,15 +75,14 @@ impl Shl<BigU288> for BigU288 {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
         while other > i {
-            for j in 0..self.0.len()-1 {
-                output.0[j+1] = self.0[j];
+            for j in 0..self.0.len() - 1 {
+                output.0[j + 1] = self.0[j];
             }
             output.0[0] = 0;
             i = i + BigU288::from_hex("1"); // Increment
         }
         output
     }
-    
 }
 
 // NOTE: This shifts in base 256
@@ -93,28 +92,27 @@ impl Shl<usize> for BigU288 {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
         while other > i {
-            for j in 0..self.0.len()-1 {
-                output.0[j+1] = self.0[j];
+            for j in 0..self.0.len() - 1 {
+                output.0[j + 1] = self.0[j];
             }
             output.0[0] = 0;
             i += 1; // Increment
         }
         output
     }
-    
 }
 
 // NOTE: This shifts in base 256
 impl Shr<BigU288> for BigU288 {
     type Output = BigU288;
-    fn shr(self,other: Self) -> Self::Output {
+    fn shr(self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
         while other > i {
-            for j in (1..self.0.len()-2).rev() {
-                output.0[j-1] = self.0[j];
+            for j in (1..self.0.len() - 2).rev() {
+                output.0[j - 1] = self.0[j];
             }
-            output.0[output.0.len()-1] = 0;
+            output.0[output.0.len() - 1] = 0;
             i = i + BigU288::from_hex("1"); // Increment
         }
         output
@@ -124,14 +122,14 @@ impl Shr<BigU288> for BigU288 {
 // NOTE: This shifts in base 256
 impl Shr<usize> for BigU288 {
     type Output = BigU288;
-    fn shr(self,other: usize) -> Self::Output {
+    fn shr(self, other: usize) -> Self::Output {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
         while other > i {
-            for j in (1..self.0.len()-2).rev() {
-                output.0[j-1] = self.0[j];
+            for j in (1..self.0.len() - 2).rev() {
+                output.0[j - 1] = self.0[j];
             }
-            output.0[output.0.len()-1] = 0;
+            output.0[output.0.len() - 1] = 0;
             i += 1; // Increment
         }
         output
@@ -143,10 +141,9 @@ impl Shr<usize> for BigU288 {
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, divisor: Self) -> Self::Output {
-
         todo!();
     }
-    
+
     // fn rem(self, other: Self) -> Self::Output {
     //     let mut numerator = self;
     //     while numerator >= other {
@@ -160,13 +157,13 @@ impl Rem for BigU288 {
 impl Div for BigU288 {
     type Output = BigU288;
     fn div(self, mut divisor: Self) -> Self::Output {
-
         dbg!(self, divisor);
 
-        // First, align values to the left
+        // First, align values to the left. NOTE TO SELF: This works!
         let mut n: usize = 0; // Number of bytes to shift left by (in-memory, this will be right due to the LE)
         let mut flag = 1; // Used as a filter, when 0, n cannot increase anymore.
-        for i in (0..self.0.len()).rev() { // Iterate over the bytes backwards
+        for i in (0..self.0.len()).rev() {
+            // Iterate over the bytes backwards
             n += flag & (self.0[i] != 0 && divisor.0[i] == 0) as usize;
             flag &= !(divisor.0[i] != 0) as usize;
         }
@@ -437,7 +434,7 @@ mod tests {
     }
 
     #[test]
-    fn division_4() { 
+    fn division_4() {
         assert_eq!(
             BigU288::from_slice(&[255, 255]) / BigU288::from_slice(&[255, 0]),
             BigU288::from_slice(&[1, 1])

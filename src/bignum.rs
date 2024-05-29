@@ -109,28 +109,37 @@ impl Shr for BigU288 {
 impl Rem for BigU288 {
     type Output = BigU288;
     fn rem(self, other: Self) -> Self::Output {
-        let mut numerator = self;
-        while numerator >= other {
-            // bigu288::new() is equal to 0
-            numerator = numerator - other;
-            dbg!(numerator);
-        }
-        numerator // Remainder
+
+        todo!();
     }
+    
+    // fn rem(self, other: Self) -> Self::Output {
+    //     let mut numerator = self;
+    //     while numerator >= other {
+    //         // bigu288::new() is equal to 0
+    //         numerator = numerator - other;
+    //     }
+    //     numerator // Remainder
+    // }
 }
 // TODO: Do this in constant time!
 impl Div for BigU288 {
     type Output = BigU288;
     fn div(self, other: Self) -> Self::Output {
-        let mut quotient = BigU288::new();
-        let mut numerator = self;
-        while numerator >= other {
-            // bigu288::new() is equal to 0
-            numerator = numerator - other;
-            quotient = quotient + BigU288::from_hex("1");
-        }
-        quotient
+
+        todo!();
     }
+
+    // fn div(self, other: Self) -> Self::Output {
+    //     let mut quotient = BigU288::new();
+    //     let mut numerator = self;
+    //     while numerator >= other {
+    //         // bigu288::new() is equal to 0
+    //         numerator = numerator - other;
+    //         quotient = quotient + BigU288::from_hex("1");
+    //     }
+    //     quotient
+    // }
 }
 
 // I don't actually know if a simple == is constant time, but to be on the safe side I implemented

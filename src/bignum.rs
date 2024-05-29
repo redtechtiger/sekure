@@ -69,7 +69,7 @@ impl Mul for BigU288 {
 }
 
 // NOTE: This shifts in base 256
-impl Shl for BigU288 {
+impl Shl<BigU288> for BigU288 {
     type Output = BigU288;
     fn shl(self, other: Self) -> Self::Output {
         let mut output = self;
@@ -84,10 +84,30 @@ impl Shl for BigU288 {
         }
         output
     }
+    
 }
 
 // NOTE: This shifts in base 256
-impl Shr for BigU288 {
+impl Shl<usize> for BigU288 {
+    type Output = BigU288;
+    fn shl(self, other: usize) -> Self::Output {
+        let mut output = self;
+        let mut i: usize = 0; // initializes to 0
+        while other > i {
+            for j in 0..self.0.len()-1 {
+                dbg!(output);
+                output.0[j+1] = self.0[j];
+            }
+            output.0[0] = 0;
+            i += 1; // Increment
+        }
+        output
+    }
+    
+}
+
+// NOTE: This shifts in base 256
+impl Shr<BigU288> for BigU288 {
     type Output = BigU288;
     fn shr(self,other: Self) -> Self::Output {
         let mut output = self;
@@ -99,6 +119,24 @@ impl Shr for BigU288 {
             }
             output.0[output.0.len()-1] = 0;
             i = i + BigU288::from_hex("1"); // Increment
+        }
+        output
+    }
+}
+
+// NOTE: This shifts in base 256
+impl Shr<usize> for BigU288 {
+    type Output = BigU288;
+    fn shr(self,other: usize) -> Self::Output {
+        let mut output = self;
+        let mut i: usize = 0; // initializes to 0
+        while other > i {
+            for j in (1..self.0.len()-2).rev() {
+                dbg!(output);
+                output.0[j-1] = self.0[j];
+            }
+            output.0[output.0.len()-1] = 0;
+            i += 1; // Increment
         }
         output
     }
@@ -125,7 +163,7 @@ impl Rem for BigU288 {
 // TODO: Do this in constant time!
 impl Div for BigU288 {
     type Output = BigU288;
-    fn div(self, divisor: Self) -> Self::Output {
+    fn div(self, mut divisor: Self) -> Self::Output {
 
         dbg!(self, divisor);
 
@@ -136,7 +174,7 @@ impl Div for BigU288 {
             n += flag & (self.0[i] != 0 && divisor.0[i] == 0) as usize;
             flag &= !(divisor.0[i] != 0) as usize;
         }
-        divisor << n; // TODO: Make this constant time!
+        divisor = divisor << n; // TODO: Make this constant time!
 
         dbg!(self, divisor);
 

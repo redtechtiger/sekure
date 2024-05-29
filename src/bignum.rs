@@ -441,6 +441,14 @@ mod tests {
     }
 
     #[test]
+    fn division_4() { 
+        assert_eq!(
+            BigU288::from_slice(&[255, 255]) / BigU288::from_slice(&[255, 0]),
+            BigU288::from_slice(&[1, 1])
+        );
+    }
+
+    #[test]
     fn remainder_1() {
         assert_eq!(
             BigU288::from_hex("a") % BigU288::from_hex("3"),

@@ -76,7 +76,6 @@ impl Shl<BigU288> for BigU288 {
         let mut i = BigU288::new(); // initializes to 0
         while other > i {
             for j in 0..self.0.len()-1 {
-                dbg!(output);
                 output.0[j+1] = self.0[j];
             }
             output.0[0] = 0;
@@ -95,7 +94,6 @@ impl Shl<usize> for BigU288 {
         let mut i: usize = 0; // initializes to 0
         while other > i {
             for j in 0..self.0.len()-1 {
-                dbg!(output);
                 output.0[j+1] = self.0[j];
             }
             output.0[0] = 0;
@@ -114,7 +112,6 @@ impl Shr<BigU288> for BigU288 {
         let mut i = BigU288::new(); // initializes to 0
         while other > i {
             for j in (1..self.0.len()-2).rev() {
-                dbg!(output);
                 output.0[j-1] = self.0[j];
             }
             output.0[output.0.len()-1] = 0;
@@ -132,7 +129,6 @@ impl Shr<usize> for BigU288 {
         let mut i: usize = 0; // initializes to 0
         while other > i {
             for j in (1..self.0.len()-2).rev() {
-                dbg!(output);
                 output.0[j-1] = self.0[j];
             }
             output.0[output.0.len()-1] = 0;

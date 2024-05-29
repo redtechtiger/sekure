@@ -108,7 +108,7 @@ impl Shr for BigU288 {
 // TODO: Do this in constant time!
 impl Rem for BigU288 {
     type Output = BigU288;
-    fn rem(self, other: Self) -> Self::Output {
+    fn rem(self, divisor: Self) -> Self::Output {
 
         todo!();
     }
@@ -125,7 +125,20 @@ impl Rem for BigU288 {
 // TODO: Do this in constant time!
 impl Div for BigU288 {
     type Output = BigU288;
-    fn div(self, other: Self) -> Self::Output {
+    fn div(self, divisor: Self) -> Self::Output {
+
+        dbg!(self, divisor);
+
+        // First, align values to the left
+        let mut n: usize = 0; // Number of bytes to shift left by (in-memory, this will be right due to the LE)
+        let mut flag = 1; // Used as a filter, when 0, n cannot increase anymore.
+        for i in (0..self.0.len()).rev() { // Iterate over the bytes backwards
+            n += flag & (self.0[i] != 0 && divisor.0[i] == 0) as usize;
+            flag &= !(divisor.0[i] != 0) as usize;
+        }
+        divisor << n; // TODO: Make this constant time!
+
+        dbg!(self, divisor);
 
         todo!();
     }

@@ -156,22 +156,36 @@ impl Rem for BigU288 {
 // TODO: Do this in constant time!
 impl Div for BigU288 {
     type Output = BigU288;
-    fn div(self, mut divisor: Self) -> Self::Output {
-        dbg!(self, divisor);
+    fn div(self, other: Self) -> Self::Output {
 
-        // First, align values to the left. NOTE TO SELF: This works!
-        let mut n: usize = 0; // Number of bytes to shift left by (in-memory, this will be right due to the LE)
-        let mut flag = 1; // Used as a filter, when 0, n cannot increase anymore.
-        for i in (0..self.0.len()).rev() {
+        let mut numerator = self;
+        let mut divisor = other;
+        let mut quotient = BigU288::new(); // 0
+
+        // Align divisor to msb of numerator and store the shift amount in n
+        let mut n: usize = 0;
+        let mut flag = 1; // Flag to detect when msb has been hit
+        for i in (0..numerator.0.len()).rev() {
             // Iterate over the bytes backwards
-            n += flag & (self.0[i] != 0 && divisor.0[i] == 0) as usize;
+            n += flag & (numerator.0[i] != 0 && divisor.0[i] == 0) as usize;
             flag &= !(divisor.0[i] != 0) as usize;
         }
         divisor = divisor << n; // TODO: Make this constant time!
-
-        dbg!(self, divisor);
-
-        todo!();
+        
+        // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
+        while other <= numerator {
+            // Subtract until not possible anymore, then add to quotient
+            let mut i = BigU288::new();
+            while divisor < numerator {
+                dbg!(self, other,  divisor, numerator, n);
+                numerator = numerator - divisor;
+                i = i + BigU288::from_hex("1");
+            }
+            quotient = quotient + i << n;
+            n -= 1;
+            divisor = divisor >> 1;
+        }
+        quotient
     }
 
     // fn div(self, other: Self) -> Self::Output {

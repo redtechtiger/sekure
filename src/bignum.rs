@@ -140,8 +140,38 @@ impl Shr<usize> for BigU288 {
 // TODO: Do this in constant time!
 impl Rem for BigU288 {
     type Output = BigU288;
-    fn rem(self, divisor: Self) -> Self::Output {
-        todo!();
+    fn rem(self, other: Self) -> Self::Output {
+        let mut numerator = self;
+        let mut divisor = other;
+        let mut quotient = BigU288::new(); // 0
+
+        // Align divisor to msb of numerator and store the shift amount in n
+        let mut n: usize = 0;
+        let mut flag = 1; // Flag to detect when msb has been hit
+        for i in (0..numerator.0.len()).rev() {
+            // Iterate over the bytes backwards
+            n += flag & (numerator.0[i] != 0 && divisor.0[i] == 0) as usize;
+            flag &= !(divisor.0[i] != 0) as usize;
+        }
+        divisor = divisor << n; // TODO: Make this constant time!
+        
+        // TODO: This is temporary! Need to find a more permament solution
+        let mut n: i64 = n as i64;
+        
+        // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
+        while other <= numerator {
+            // Subtract until not possible anymore, then add to quotient
+            let mut i = BigU288::new();
+            while divisor <= numerator {
+                dbg!(self, other,  divisor, numerator, n);
+                numerator = numerator - divisor;
+                i = i + BigU288::from_hex("1");
+            }
+            quotient = quotient + i << n as usize;
+            n -= 1;
+            divisor = divisor >> 1;
+        }
+        numerator
     }
 
     // fn rem(self, other: Self) -> Self::Output {

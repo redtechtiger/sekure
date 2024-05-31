@@ -74,7 +74,7 @@ impl Shl<BigU288> for BigU288 {
     fn shl(mut self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
-        let one = BigU288::from_hex("0");
+        let one = BigU288::from_hex("1");
         while other > i {
             for j in 0..self.0.len() - 1 {
                 output.0[j + 1] = self.0[j];

@@ -71,7 +71,7 @@ impl Mul for BigU288 {
 // NOTE: This shifts in base 256
 impl Shl<BigU288> for BigU288 {
     type Output = BigU288;
-    fn shl(self, other: Self) -> Self::Output {
+    fn shl(mut self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
         let one = BigU288::from_hex("0");
@@ -80,6 +80,7 @@ impl Shl<BigU288> for BigU288 {
                 output.0[j + 1] = self.0[j];
             }
             output.0[0] = 0;
+            self = output;
             i = i + one; // Increment
         }
         output
@@ -89,7 +90,7 @@ impl Shl<BigU288> for BigU288 {
 // NOTE: This shifts in base 256
 impl Shl<usize> for BigU288 {
     type Output = BigU288;
-    fn shl(self, other: usize) -> Self::Output {
+    fn shl(mut self, other: usize) -> Self::Output {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
         while other > i {
@@ -97,6 +98,7 @@ impl Shl<usize> for BigU288 {
                 output.0[j + 1] = self.0[j];
             }
             output.0[0] = 0;
+            self = output;
             i += 1; // Increment
         }
         output
@@ -106,7 +108,7 @@ impl Shl<usize> for BigU288 {
 // NOTE: This shifts in base 256
 impl Shr<BigU288> for BigU288 {
     type Output = BigU288;
-    fn shr(self, other: Self) -> Self::Output {
+    fn shr(mut self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
         let one = BigU288::from_hex("1");
@@ -115,6 +117,7 @@ impl Shr<BigU288> for BigU288 {
                 output.0[j - 1] = self.0[j];
             }
             output.0[output.0.len() - 1] = 0;
+            self = output;
             i = i + one; // Increment
         }
         output
@@ -124,7 +127,7 @@ impl Shr<BigU288> for BigU288 {
 // NOTE: This shifts in base 256
 impl Shr<usize> for BigU288 {
     type Output = BigU288;
-    fn shr(self, other: usize) -> Self::Output {
+    fn shr(mut self, other: usize) -> Self::Output {
         let mut output = self;
         let mut i: usize = 0; // initializes to 0
         while other > i {
@@ -132,6 +135,7 @@ impl Shr<usize> for BigU288 {
                 output.0[j - 1] = self.0[j];
             }
             output.0[output.0.len() - 1] = 0;
+            self = output;
             i += 1; // Increment
         }
         output
@@ -161,12 +165,9 @@ impl Rem for BigU288 {
         // TODO: This is temporary! Need to find a more permament solution
         let mut n: i64 = n as i64;
         
-        dbg!("Original divisor", other);
-        dbg!("Shifted divisor", divisor);
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
-            dbg!(numerator);
             let mut i = BigU288::new();
             while divisor <= numerator {
                 numerator = numerator - divisor;

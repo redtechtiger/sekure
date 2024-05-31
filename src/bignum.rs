@@ -74,12 +74,13 @@ impl Shl<BigU288> for BigU288 {
     fn shl(self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
+        let one = BigU288::from_hex("0");
         while other > i {
             for j in 0..self.0.len() - 1 {
                 output.0[j + 1] = self.0[j];
             }
             output.0[0] = 0;
-            i = i + BigU288::from_hex("1"); // Increment
+            i = i + one; // Increment
         }
         output
     }
@@ -108,12 +109,13 @@ impl Shr<BigU288> for BigU288 {
     fn shr(self, other: Self) -> Self::Output {
         let mut output = self;
         let mut i = BigU288::new(); // initializes to 0
+        let one = BigU288::from_hex("1");
         while other > i {
             for j in (1..self.0.len() - 2).rev() {
                 output.0[j - 1] = self.0[j];
             }
             output.0[output.0.len() - 1] = 0;
-            i = i + BigU288::from_hex("1"); // Increment
+            i = i + one; // Increment
         }
         output
     }
@@ -144,6 +146,7 @@ impl Rem for BigU288 {
         let mut numerator = self;
         let mut divisor = other;
         let mut quotient = BigU288::new(); // 0
+        let one = BigU288::from_hex("1");
 
         // Align divisor to msb of numerator and store the shift amount in n
         let mut n: usize = 0;
@@ -151,20 +154,23 @@ impl Rem for BigU288 {
         for i in (0..numerator.0.len()).rev() {
             // Iterate over the bytes backwards
             n += flag & (numerator.0[i] != 0 && divisor.0[i] == 0) as usize;
-            flag &= !(divisor.0[i] != 0) as usize;
+            flag &= (divisor.0[i] == 0) as usize;
         }
         divisor = divisor << n; // TODO: Make this constant time!
         
         // TODO: This is temporary! Need to find a more permament solution
         let mut n: i64 = n as i64;
         
+        dbg!("Original divisor", other);
+        dbg!("Shifted divisor", divisor);
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
+            dbg!(numerator);
             let mut i = BigU288::new();
             while divisor <= numerator {
                 numerator = numerator - divisor;
-                i = i + BigU288::from_hex("1");
+                i = i + one;
             }
             quotient = quotient + i << n as usize;
             n -= 1;
@@ -190,6 +196,7 @@ impl Div for BigU288 {
         let mut numerator = self;
         let mut divisor = other;
         let mut quotient = BigU288::new(); // 0
+        let one = BigU288::from_hex("1");
 
         // Align divisor to msb of numerator and store the shift amount in n
         let mut n: usize = 0;
@@ -210,7 +217,7 @@ impl Div for BigU288 {
             let mut i = BigU288::new();
             while divisor <= numerator {
                 numerator = numerator - divisor;
-                i = i + BigU288::from_hex("1");
+                i = i + one;
             }
             quotient = quotient + i << n as usize;
             n -= 1;

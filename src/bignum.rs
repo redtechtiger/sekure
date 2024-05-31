@@ -172,16 +172,19 @@ impl Div for BigU288 {
         }
         divisor = divisor << n; // TODO: Make this constant time!
         
+        // TODO: This is temporary! Need to find a more permament solution
+        let mut n: i64 = n as i64;
+        
         // Keep shifting divisor to the right (decrease, in-memory left shift due to le)
         while other <= numerator {
             // Subtract until not possible anymore, then add to quotient
             let mut i = BigU288::new();
-            while divisor < numerator {
+            while divisor <= numerator {
                 dbg!(self, other,  divisor, numerator, n);
                 numerator = numerator - divisor;
                 i = i + BigU288::from_hex("1");
             }
-            quotient = quotient + i << n;
+            quotient = quotient + i << n as usize;
             n -= 1;
             divisor = divisor >> 1;
         }

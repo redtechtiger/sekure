@@ -163,7 +163,6 @@ impl Rem for BigU288 {
             // Subtract until not possible anymore, then add to quotient
             let mut i = BigU288::new();
             while divisor <= numerator {
-                dbg!(self, other,  divisor, numerator, n);
                 numerator = numerator - divisor;
                 i = i + BigU288::from_hex("1");
             }
@@ -210,7 +209,6 @@ impl Div for BigU288 {
             // Subtract until not possible anymore, then add to quotient
             let mut i = BigU288::new();
             while divisor <= numerator {
-                dbg!(self, other,  divisor, numerator, n);
                 numerator = numerator - divisor;
                 i = i + BigU288::from_hex("1");
             }

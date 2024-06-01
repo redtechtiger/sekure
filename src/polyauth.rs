@@ -2,25 +2,25 @@ use crate::bignum::BigU288;
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
-    clamp(&mut r); // TODO: Figure out if we can get rid of
-                   // the ugly .try_into().unwrap()
+    clamp(&mut r);
+
     let r = BigU288::from_slice(&r);
     let s = &key[16..31];
-    let p = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // TODO: Fix this garbage
+    let p = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // Large prime constant
     let mut acc = BigU288::new();
 
     for i in 0..msg.len().div_ceil(16) {
-        dbg!(i);
-        // Iterate over every 16 byte block
-        let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..i * 16 + 15]);
-        dbg!(n.get_bytes());
-        // n.add_msb(); // Find a way of fixing this!
+        let bytes_read = std::cmp::min(msg.len()-i*16, 16);
+        let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..std::cmp::min(i * 16 + 15,msg.len())]);
+        // Add one bit beyond the number of bytes read
+        // I.e., 1 byte  -> add 0000 0001 0000
+        //       2 bytes -> add 0001 0000 0000
+
+        n = n + BigU288::from_slice(&[]);
+
+        // Fancy1305 math
         acc = acc + n;
-        dbg!(r.get_bytes());
-        dbg!(acc * r);
-        dbg!((acc * r) % p);
         acc = (acc * r) % p;
-        dbg!(acc.get_bytes());
     }
 
     acc = acc + BigU288::from_slice(s);

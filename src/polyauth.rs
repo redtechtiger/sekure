@@ -6,7 +6,7 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     clamp(&mut r);
 
     let r = BigU288::from_slice(&r);
-    let s = &key[16..31];
+    let s = &key[16..32];
     let p = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // Large prime constant
     let mut acc = BigU288::new();
 
@@ -38,6 +38,7 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     }
 
     acc = acc + BigU288::from_slice(s);
+    println!("{}", BigU288::from_slice(s));
     acc.get_bytes().to_vec()
 }
 

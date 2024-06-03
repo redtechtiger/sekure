@@ -4,18 +4,14 @@ use crate::bignum::BigU288;
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
-
     let r = BigU288::from_slice(&r);
     let s = &key[16..32];
     let p = BigU288::from_hex("3fffffffffffffffffffffffffffffffb"); // Large prime constant
     let mut acc = BigU288::new();
 
-    dbg!(msg.len());
-
     for i in 0..msg.len().div_ceil(16) {
         let bytes_read = std::cmp::min(msg.len()-i*16, 16) as u8;
         let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
-        println!("Initial read block: {}", n);
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
@@ -28,18 +24,13 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         );
 
         n = n + add_msb;
-        println!("Block with MSB: {}", n);
 
-        // Fancy1305 math
+        // Fancy 1305 math
         acc = acc + n;
-        println!("Acc with n: {}", acc);
         acc = (acc * r) % p;
-        println!("Acc after modulo: {}", acc);
     }
 
     acc = acc + BigU288::from_slice(s);
-    println!("{}", BigU288::from_slice(s));
-    println!("{}", acc);
     acc.get_bytes()[0..16].to_vec()
 }
 

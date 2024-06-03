@@ -1,6 +1,6 @@
 // Implementation of the ChaCha20 encryption/decryption algorithm
 
-pub fn encrypt(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -> Vec<u8> {
+pub fn cipher_xor(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -> Vec<u8> {
     let mut encrypted_message: Vec<u8> = Vec::new();
     // Loop for every 64 characters, i.e. every 512 bits
     for i in 0..(plaintext.len() / 64) {
@@ -18,26 +18,6 @@ pub fn encrypt(plaintext: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -
         encrypted_message.extend_from_slice(&encrypted_block[0..plaintext.len() % 64]);
     }
     encrypted_message
-}
-
-pub fn decrypt(encrypted: &[u8], key: [u32; 8], nonce: [u32; 3], counter: u32) -> Vec<u8> {
-    let mut plaintext: Vec<u8> = Vec::new();
-    // Loop for every 64 characters, i.e. every 512 bits
-    for i in 0..(encrypted.len() / 64) {
-        let key_stream = block(key, nonce, counter + i as u32);
-        let input_block: &[u8] = &encrypted[i * 64..i * 64 + 64]; // Grab the current block of 64 characters/512 bits, and serialize into bytes.
-        let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
-        plaintext.extend_from_slice(&encrypted_block);
-    }
-    // Check if there's a partial block left
-    if encrypted.len() % 64 != 0 {
-        let i = encrypted.len() / 64;
-        let key_stream = block(key, nonce, counter + i as u32);
-        let input_block: &[u8] = &encrypted[i * 64..encrypted.len()];
-        let encrypted_block = xor_serialized(&serialize_state(key_stream), &input_block);
-        plaintext.extend_from_slice(&encrypted_block[0..encrypted.len() % 64]);
-    }
-    plaintext
 }
 
 pub fn block(key: [u32; 8], nonce: [u32; 3], counter: u32) -> [u32; 16] {
@@ -287,7 +267,7 @@ mod tests {
     }
 
     #[test]
-    fn encrypt_1() {
+    fn cipher_xor_1() {
         let plaintext = &[
             0x4cu8, 0x61u8, 0x64u8, 0x69u8, 0x65u8, 0x73u8, 0x20u8, 0x61u8, 0x6eu8, 0x64u8, 0x20u8,
             0x47u8, 0x65u8, 0x6eu8, 0x74u8, 0x6cu8, 0x65u8, 0x6du8, 0x65u8, 0x6eu8, 0x20u8, 0x6fu8,
@@ -307,7 +287,7 @@ mod tests {
         ];
         let nonce = [0x00000000, 0x4a000000, 0x00000000];
         let counter = 1;
-        let encrypted_data = encrypt(plaintext, key, nonce, counter);
+        let encrypted_data = cipher_xor(plaintext, key, nonce, counter);
         assert_eq!(
             encrypted_data,
             [
@@ -325,7 +305,7 @@ mod tests {
     }
 
     #[test]
-    fn decrypt_1() {
+    fn cipher_xor_2() {
         let encrypted = &[
             0x6e, 0x2e, 0x35, 0x9a, 0x25, 0x68, 0xf9, 0x80, 0x41, 0xba, 0x07, 0x28, 0xdd, 0x0d,
             0x69, 0x81, 0xe9, 0x7e, 0x7a, 0xec, 0x1d, 0x43, 0x60, 0xc2, 0x0a, 0x27, 0xaf, 0xcc,
@@ -344,7 +324,7 @@ mod tests {
         let nonce = [0x00000000, 0x4a000000, 0x00000000];
         let counter = 1;
         assert_eq!(
-            decrypt(encrypted, key, nonce, counter),
+            cipher_xor(encrypted, key, nonce, counter),
             [
                 0x4cu8, 0x61u8, 0x64u8, 0x69u8, 0x65u8, 0x73u8, 0x20u8, 0x61u8, 0x6eu8, 0x64u8,
                 0x20u8, 0x47u8, 0x65u8, 0x6eu8, 0x74u8, 0x6cu8, 0x65u8, 0x6du8, 0x65u8, 0x6eu8,

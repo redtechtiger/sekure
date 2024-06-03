@@ -15,15 +15,15 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
+        let mut add_msb = [0u8; 17]; // Biggest number we'll ever add is the 17th byte since we're
+                                 // reading 16 bytes
 
-        // TODO: Tidy this up!
-        let add_msb = BigU288::from_slice(
-            &[
-                (bytes_read == 0) as u8, (bytes_read == 1) as u8, (bytes_read == 2) as u8, (bytes_read == 3) as u8, (bytes_read == 4) as u8, (bytes_read == 5) as u8, (bytes_read == 6) as u8, (bytes_read == 7) as u8, (bytes_read == 8) as u8, (bytes_read == 9) as u8, (bytes_read == 10) as u8, (bytes_read == 11) as u8, (bytes_read == 12) as u8, (bytes_read == 13) as u8, (bytes_read == 14) as u8, (bytes_read == 15) as u8, (bytes_read == 16) as u8
-            ]
-        );
+        // This is still slow - TODO: Optimize this
+        for i in 0..17 {
+            add_msb[i] = (bytes_read == i as u8) as u8;
+        }
 
-        n = n + add_msb;
+        n = n + BigU288::from_slice(&add_msb);
 
         // Fancy 1305 math
         acc = acc + n;

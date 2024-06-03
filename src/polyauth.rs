@@ -39,7 +39,8 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
 
     acc = acc + BigU288::from_slice(s);
     println!("{}", BigU288::from_slice(s));
-    acc.get_bytes().to_vec()
+    println!("{}", acc);
+    acc.get_bytes()[0..16].to_vec()
 }
 
 fn clamp(r: &mut [u8; 16]) -> () {

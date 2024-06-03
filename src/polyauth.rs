@@ -10,13 +10,20 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut acc = BigU288::new();
 
     for i in 0..msg.len().div_ceil(16) {
-        let bytes_read = std::cmp::min(msg.len()-i*16, 16);
+        let bytes_read = std::cmp::min(msg.len()-i*16, 16) as u8;
         let mut n: BigU288 = BigU288::from_slice(&msg[i * 16..std::cmp::min(i * 16 + 15,msg.len())]);
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
 
-        n = n + BigU288::from_slice(&[]);
+        // TODO: Tidy this up!
+        let add_msb = BigU288::from_slice(
+            &[
+                (bytes_read == 0) as u8, (bytes_read == 1) as u8, (bytes_read == 2) as u8, (bytes_read == 3) as u8, (bytes_read == 4) as u8, (bytes_read == 5) as u8, (bytes_read == 6) as u8, (bytes_read == 7) as u8, (bytes_read == 8) as u8, (bytes_read == 9) as u8, (bytes_read == 10) as u8, (bytes_read == 11) as u8, (bytes_read == 12) as u8, (bytes_read == 13) as u8, (bytes_read == 14) as u8, (bytes_read == 15) as u8, (bytes_read == 16) as u8
+            ]
+        );
+
+        n = n + add_msb;
 
         // Fancy1305 math
         acc = acc + n;
@@ -24,7 +31,6 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     }
 
     acc = acc + BigU288::from_slice(s);
-    // todo!();
     acc.get_bytes().to_vec()
 }
 
@@ -72,6 +78,6 @@ mod tests {
                 0x41, 0x49, 0xf5, 0x1b,
             ],
         );
-        todo!("test isn't done, nor is the implementation, panic so that we can see debug log");
+        
     }
 }

@@ -18,3 +18,4 @@ impl Cryptstream {
         todo!("Flushing cryptstream not implemented yet");
     }
 }
+

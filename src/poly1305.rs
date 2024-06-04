@@ -16,7 +16,7 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
         let mut add_msb = [0u8; 17]; // Biggest number we'll ever add is the 17th byte since we're
-                                 // reading 16 bytes
+                                     // reading 16 bytes
 
         // This is still slow - TODO: Optimize this
         for i in 0..17 {
@@ -85,3 +85,4 @@ mod tests {
         )        
     }
 }
+

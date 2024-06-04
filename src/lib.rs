@@ -1,6 +1,6 @@
 mod bcrypt;
 mod bignum;
-mod cipher;
-mod polyauth;
-mod stream;
+mod chacha20;
+mod poly1305;
+mod cryptstream;
 

@@ -1,5 +1,4 @@
-use crate::bignum::BigU288;
-
+use const_time_bignum::BigU288;
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();

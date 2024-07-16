@@ -1,16 +1,16 @@
-use crypto_bigint::U256;
+use crypto_bigint::{U256, NonZero, Encoding};
 
 pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
-    let r = U256::from_slice(&r);
+    let p = NonZero::new(U256::from_be_hex("00000000000000000000000000000003fffffffffffffffffffffffffffffffb")).unwrap(); // Large prime constant
+    let r = U256::from_le_slice(&r);
     let s = &key[16..32];
-    let p = U256::from_hex("3fffffffffffffffffffffffffffffffb"); // Large prime constant
-    let mut acc = U256::new();
+    let mut acc = U256::ZERO;
 
     for i in 0..msg.len().div_ceil(16) {
         let bytes_read = std::cmp::min(msg.len()-i*16, 16) as u8;
-        let mut n: U256 = U256::from_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
+        let mut n: U256 = U256::from_le_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
@@ -22,15 +22,16 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
             add_msb[i] = (bytes_read == i as u8) as u8;
         }
 
-        n = n + U256::from_slice(&add_msb);
+        n = n.wrapping_add(&U256::from_le_slice(&add_msb));
 
         // Fancy 1305 math
-        acc = acc + n;
-        acc = (acc * r) % p;
+        acc.wrapping_add(&n);
+        acc = acc.wrapping_mul(&r);
+        acc = acc.div_rem(&p).1; // Select remainder
     }
 
-    acc = acc + U256::from_slice(s);
-    acc.get_bytes()[0..16].to_vec()
+    acc = acc.wrapping_add(&U256::from_le_slice(s));
+    acc.to_le_bytes()[0..16].to_vec()
 }
 
 fn clamp(r: &mut [u8; 16]) -> () {

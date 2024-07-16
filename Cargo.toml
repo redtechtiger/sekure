@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-const-time-bignum = "0.1.1"
+crypto-bigint = "0.5.5"

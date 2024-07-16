@@ -4,23 +4,27 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
     let p = NonZero::new(U256::from_be_hex("00000000000000000000000000000003fffffffffffffffffffffffffffffffb")).unwrap(); // Large prime constant
-    let r = U256::from_le_slice(&r);
-    let s = &key[16..32];
+    let r = U256::from(u128::from_le_bytes(r));
+    let s: [u8; 16] = key[16..32].try_into().unwrap();
     let mut acc = U256::ZERO;
 
     for i in 0..msg.len().div_ceil(16) {
-        let bytes_read = std::cmp::min(msg.len()-i*16, 16) as u8;
-        let mut n: U256 = U256::from_le_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
+        let bytes_read = std::cmp::min(msg.len()-i*16, 16) as usize;
+        // We need to copy a 16 byte chunk of data (or less!) into the U256 'n'.
+        let mut n: [u8; 16] = [0; 16]; // Zero-initialize
+        n[..bytes_read].copy_from_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
+        let mut n: U256 = U256::from(u128::from_le_bytes(n));
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
         //       2 bytes -> add 0001 0000 0000
-        let mut add_msb = [0u8; 17]; // Biggest number we'll ever add is the 17th byte since we're
+        let mut add_msb = [0u8; 32]; // Biggest number we'll ever add is the 17th byte since we're
                                      // reading 16 bytes
 
         // This is still slow - TODO: Optimize this
         for i in 0..17 {
-            add_msb[i] = (bytes_read == i as u8) as u8;
+            add_msb[i] = (bytes_read == i) as u8;
         }
+
 
         n = n.wrapping_add(&U256::from_le_slice(&add_msb));
 
@@ -30,7 +34,7 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         acc = acc.div_rem(&p).1; // Select remainder
     }
 
-    acc = acc.wrapping_add(&U256::from_le_slice(s));
+    acc = acc.wrapping_add(&U256::from(u128::from_le_bytes(s)));
     acc.to_le_bytes()[0..16].to_vec()
 }
 

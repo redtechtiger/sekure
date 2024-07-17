@@ -6,7 +6,7 @@ This is an intuitive & performant file encryption library for Rust, providing en
 Sekure will be available as a crate from Cargo once basic functionality is complete. Example usage:
 ```
 // Define our password and file location
-let filename = "my_file.txt"
+let filename = "my_file.txt";
 let password = "foobar2024";
 
 // Open the file

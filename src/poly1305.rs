@@ -29,7 +29,7 @@ pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
         n = n.wrapping_add(&U256::from_le_slice(&add_msb));
 
         // Fancy 1305 math
-        acc.wrapping_add(&n);
+        acc = acc.wrapping_add(&n);
         acc = acc.wrapping_mul(&r);
         acc = acc.div_rem(&p).1; // Select remainder
     }

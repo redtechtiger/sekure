@@ -1,5 +1,5 @@
-use crypto_bigint::{Encoding, NonZero, U256};
 use super::chacha20::block;
+use crypto_bigint::{Encoding, NonZero, U256};
 
 pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> [u8; 16] {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
@@ -48,7 +48,7 @@ pub fn generate_poly_key(key: [u32; 8], nonce: [u32; 3]) -> [u8; 32] {
     // Serialize this! 8 * u32 = 32 * u8
     let mut serialized_key = [0u8; 32];
     for i in 0..kept_state.len() {
-        serialized_key[i*4..][..4].copy_from_slice(&kept_state[i].to_le_bytes());
+        serialized_key[i * 4..][..4].copy_from_slice(&kept_state[i].to_le_bytes());
     }
     serialized_key
 }

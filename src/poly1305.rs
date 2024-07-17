@@ -1,6 +1,6 @@
 use crypto_bigint::{U256, NonZero, Encoding};
 
-pub fn generate(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
+pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
     let p = NonZero::new(U256::from_be_hex("00000000000000000000000000000003fffffffffffffffffffffffffffffffb")).unwrap(); // Large prime constant
@@ -73,9 +73,9 @@ mod tests {
     }
 
     #[test]
-    fn generate_1() {
+    fn generate_tag_1() {
         assert_eq!(
-            generate(
+            generate_tag(
                 b"Cryptographic Forum Research Group",
                 [
                     0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5,

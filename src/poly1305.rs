@@ -1,6 +1,6 @@
 use crypto_bigint::{U256, NonZero, Encoding};
 
-pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
+pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> [u8; 16] {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
     let p = NonZero::new(U256::from_be_hex("00000000000000000000000000000003fffffffffffffffffffffffffffffffb")).unwrap(); // Large prime constant
@@ -35,7 +35,7 @@ pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> Vec<u8> {
     }
 
     acc = acc.wrapping_add(&U256::from(u128::from_le_bytes(s)));
-    acc.to_le_bytes()[0..16].to_vec()
+    acc.to_le_bytes()[0..16].try_into().unwrap()
 }
 
 fn clamp(r: &mut [u8; 16]) -> () {

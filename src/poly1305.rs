@@ -1,18 +1,21 @@
-use crypto_bigint::{U256, NonZero, Encoding};
+use crypto_bigint::{Encoding, NonZero, U256};
 
 pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> [u8; 16] {
     let mut r: [u8; 16] = key[0..16].try_into().unwrap();
     clamp(&mut r);
-    let p = NonZero::new(U256::from_be_hex("00000000000000000000000000000003fffffffffffffffffffffffffffffffb")).unwrap(); // Large prime constant
+    let p = NonZero::new(U256::from_be_hex(
+        "00000000000000000000000000000003fffffffffffffffffffffffffffffffb",
+    ))
+    .unwrap(); // Large prime constant
     let r = U256::from(u128::from_le_bytes(r));
     let s: [u8; 16] = key[16..32].try_into().unwrap();
     let mut acc = U256::ZERO;
 
     for i in 0..msg.len().div_ceil(16) {
-        let bytes_read = std::cmp::min(msg.len()-i*16, 16) as usize;
+        let bytes_read = std::cmp::min(msg.len() - i * 16, 16) as usize;
         // We need to copy a 16 byte chunk of data (or less!) into the U256 'n'.
         let mut n: [u8; 16] = [0; 16]; // Zero-initialize
-        n[..bytes_read].copy_from_slice(&msg[i * 16..std::cmp::min(i * 16 + 16,msg.len())]);
+        n[..bytes_read].copy_from_slice(&msg[i * 16..std::cmp::min(i * 16 + 16, msg.len())]);
         let mut n: U256 = U256::from(u128::from_le_bytes(n));
         // Add one bit beyond the number of bytes read
         // I.e., 1 byte  -> add 0000 0001 0000
@@ -24,7 +27,6 @@ pub fn generate_tag(msg: &[u8], key: [u8; 32]) -> [u8; 16] {
         for i in 0..17 {
             add_msb[i] = (bytes_read == i) as u8;
         }
-
 
         n = n.wrapping_add(&U256::from_le_slice(&add_msb));
 
@@ -78,15 +80,15 @@ mod tests {
             generate_tag(
                 b"Cryptographic Forum Research Group",
                 [
-                    0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5,
-                    0x06, 0xa8, 0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd, 0x4a, 0xbf, 0xf6, 0xaf,
-                    0x41, 0x49, 0xf5, 0x1b,
+                    0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33, 0x7f, 0x44, 0x52, 0xfe, 0x42,
+                    0xd5, 0x06, 0xa8, 0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd, 0x4a, 0xbf,
+                    0xf6, 0xaf, 0x41, 0x49, 0xf5, 0x1b,
                 ],
             ),
             [
-                0xa8, 0x06, 0x1d, 0xc1, 0x30, 0x51, 0x36, 0xc6, 0xc2, 0x2b, 0x8b, 0xaf, 0x0c, 0x01, 0x27, 0xa9
+                0xa8, 0x06, 0x1d, 0xc1, 0x30, 0x51, 0x36, 0xc6, 0xc2, 0x2b, 0x8b, 0xaf, 0x0c, 0x01,
+                0x27, 0xa9
             ]
-        )        
+        )
     }
 }
-

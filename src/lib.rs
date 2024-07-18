@@ -1,4 +1,4 @@
-mod chacha20;
-mod cryptstream;
-mod pbkdf2;
-mod poly1305;
+pub mod chacha20;
+pub mod cryptstream;
+pub mod pbkdf2;
+pub mod poly1305;

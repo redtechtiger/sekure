@@ -98,6 +98,7 @@ version = "0.1.0"
 dependencies = [
  "crypto-bigint",
  "sha2",
+ "typenum",
 ]
 
 [[package]]

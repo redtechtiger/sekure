@@ -14,10 +14,12 @@ where
         panic!("master key length exceeds maximum allowed by sha256");
     }
 
-    let r = KEYLEN - (derive_len(KEYLEN) - 1) * 256;
+    let r = KEYLEN - (derive_len(KEYLEN) - 1) * DIGEST_SIZE;
     let t = [0u8; derive_len(KEYLEN)];
 
-    for i in 1..=derive_len(KEYLEN) {}
+    for i in 1..=derive_len(KEYLEN) {
+        
+    }
 
     todo!();
 }

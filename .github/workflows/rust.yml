@@ -13,19 +13,19 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    name: Build
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
     - run: rustup update nightly && rustup default nightly
     - run: cargo build --verbose
       
   test:
 
     runs-on: ubuntu-latest
+    name: Run tests
     
     steps:
     - uses: actions/checkout@v4
-    - name: Run tests
     - run: rustup update nightly && rustup default nightly
     - run: cargo test --verbose

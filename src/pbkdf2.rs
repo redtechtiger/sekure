@@ -26,3 +26,14 @@ where
 const fn derive_len(keylen: usize) -> usize {
     (keylen / DIGEST_SIZE) + (keylen % DIGEST_SIZE != 0) as usize
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn derive_cryptographic_key_1() {
+        // Temporary test case to observe function behavior
+        derive_cryptographic_key::<512>("foobar", [0; 128], 10_000);
+    }
+}

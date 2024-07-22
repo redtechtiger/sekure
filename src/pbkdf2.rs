@@ -2,7 +2,6 @@ const DIGEST_SIZE: usize = 256; // SHA256 is used
 
 // KEYLEN is the amount of bytes the cryptographic key shall contain
 pub fn derive_cryptographic_key<const KEYLEN: usize>(
-    keylen: usize,
     password: &str,
     salt: [u8; 128],
     iteration_count: usize,
@@ -18,7 +17,7 @@ where
     let t = [0u8; derive_len(KEYLEN)];
 
     for i in 1..=derive_len(KEYLEN) {
-        
+        dbg!(i);
     }
 
     todo!();

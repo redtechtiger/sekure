@@ -17,9 +17,9 @@ where
     }
 
     let octets_in_last_block = KEYLEN - (derive_num_blocks(KEYLEN) - 1) * DIGEST_SIZE; // Needed?
-    let t: [DigestType; KEYLEN];
+    let mut t: [DigestType; KEYLEN] = [DigestType::new(); KEYLEN];
     for i in 1..=derive_num_blocks(KEYLEN) {
-        
+        t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
 
     todo!();

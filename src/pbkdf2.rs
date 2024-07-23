@@ -35,15 +35,14 @@ where
 }
 
 fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize) -> DigestType {
-    let mut u: DigestType = [0u8; DIGEST_SIZE / 8];
     // Initial hash will be salt with the index concatenated onto it
     let mut initial_concat = [0u8; 128+4]; // Length of salt plus index (converted to 4 bytes)
     initial_concat[0..128].copy_from_slice(&salt);
     initial_concat[128..].copy_from_slice(&(index as i32).to_be_bytes());
 
-    u = hmac_sha256(password, &initial_concat);
-    for i in 1..ITERATION_COUNT {
-        u ^= hmac_sha256(password, u);
+    let mut u = hmac_sha256(password, &initial_concat);
+    for _ in 1..ITERATION_COUNT {
+        u = xor_digest_type(u, hmac_sha256(password, &u));
     }
     u
 }

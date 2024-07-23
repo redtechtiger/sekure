@@ -20,15 +20,16 @@ where
 
     // Derive the actual cryptographic key
     let octets_in_last_block = KEYLEN - (derive_num_blocks(KEYLEN) - 1) * DIGEST_SIZE; // Needed?
-    let mut t: [DigestType; KEYLEN] = [[0u8; DIGEST_SIZE / 8]; KEYLEN];
-    for i in 1..=derive_num_blocks(KEYLEN) {
+    let mut t: [DigestType; derive_num_blocks(KEYLEN)] = [[0u8; DIGEST_SIZE / 8]; derive_num_blocks(KEYLEN)];
+    for i in 1..derive_num_blocks(KEYLEN) {
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
     
     // Convert to suitable output format TODO: Make this safer
     let mut out = [0u8; KEYLEN];
     for i in 0..t.len() {
-        out[i..i*(DIGEST_SIZE/8)].copy_from_slice(&t[i]);
+        dbg!(t.len());
+        out[i*(DIGEST_SIZE/8)..i*(DIGEST_SIZE/8)+(DIGEST_SIZE/8)].copy_from_slice(&t[i]);
     }
 
     out
@@ -73,6 +74,6 @@ mod tests {
     #[test]
     fn derive_cryptographic_key_1() {
         // Temporary test case to observe function behavior
-        // derive_cryptographic_key::<512>("foobar", [0; 128], 10_000);
+        derive_cryptographic_key::<512, 1000>("foobar", [0; 128]);
     }
 }

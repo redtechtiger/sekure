@@ -35,21 +35,29 @@ where
 }
 
 fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize) -> DigestType {
-    let mut u: [DigestType; ITERATION_COUNT] = [[0u8; DIGEST_SIZE / 8]; ITERATION_COUNT];
+    let mut u: DigestType = [0u8; DIGEST_SIZE / 8];
     // Initial hash will be salt with the index concatenated onto it
     let mut initial_concat = [0u8; 128+4]; // Length of salt plus index (converted to 4 bytes)
     initial_concat[0..128].copy_from_slice(&salt);
     initial_concat[128..].copy_from_slice(&(index as i32).to_be_bytes());
 
-    u[0] = hmac_sha256(password, &initial_concat);
+    u = hmac_sha256(password, &initial_concat);
     for i in 1..ITERATION_COUNT {
-        
+        u ^= hmac_sha256(password, u);
     }
-    todo!();
+    u
 }
 
 const fn derive_num_blocks(keylen: usize) -> usize {
     (keylen / DIGEST_SIZE) + (keylen % DIGEST_SIZE != 0) as usize
+}
+
+fn xor_digest_type(a: DigestType, b: DigestType) -> DigestType {
+    let mut out = [0u8; DIGEST_SIZE / 8];
+    for i in 0..a.len() {
+        out[i] = a[i] ^ b[i];
+    }
+    out
 }
 
 fn hmac_sha256(password: &str, input: &[u8]) -> [u8; DIGEST_SIZE/8] {

@@ -1,4 +1,5 @@
 use sha2::Sha256;
+use hmac::{Hmac, Mac};
 use sha2::digest::typenum::U256;
 const DIGEST_SIZE: usize = 256; // SHA256 is used
 type DigestType = U256;
@@ -40,6 +41,13 @@ fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize
 
 const fn derive_num_blocks(keylen: usize) -> usize {
     (keylen / DIGEST_SIZE) + (keylen % DIGEST_SIZE != 0) as usize
+}
+
+fn hmac_sha256(password: &str, input: &[u8]) -> [u8; 256/8] {
+    let mut mac = Hmac::<Sha256>::new_from_slice(password.as_bytes()).expect("hmac key initialization failed");
+    mac.update(input);
+    let result = mac.finalize();
+    result.into_bytes().into()
 }
 
 #[cfg(test)]

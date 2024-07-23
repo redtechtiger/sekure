@@ -25,10 +25,10 @@ where
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
     
-    // Convert to suitable output format
+    // Convert to suitable output format TODO: Make this safer
     let mut out = [0u8; KEYLEN];
-    for block in t {
-        // t[0].
+    for i in 0..t.len() {
+        out[i..i*(DIGEST_SIZE/8)].copy_from_slice(&t[i]);
     }
 
     out

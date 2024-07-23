@@ -12,21 +12,29 @@ where
     [(); derive_num_blocks(KEYLEN)]:,
     [(); ITERATION_COUNT+1]:,
 {
+    // Check that values are valid
     if KEYLEN > (2usize.pow(32) - 1) * DIGEST_SIZE {
         panic!("derived key too long");
     }
 
+    // Derive the actual cryptographic key
     let octets_in_last_block = KEYLEN - (derive_num_blocks(KEYLEN) - 1) * DIGEST_SIZE; // Needed?
     let mut t: [DigestType; KEYLEN] = [DigestType::new(); KEYLEN];
     for i in 1..=derive_num_blocks(KEYLEN) {
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
+    
+    // Convert to suitable output format
+    let mut out = [0u8; KEYLEN];
+    for block in t {
+        // t[0].
+    }
 
-    todo!();
+    out
 }
 
 fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize) -> DigestType {
-
+    
     todo!();
 }
 

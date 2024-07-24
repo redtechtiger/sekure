@@ -9,7 +9,7 @@ type DigestType = [u8; DIGEST_SIZE / 8];
 pub fn derive_cryptographic_key<const KEYLEN: usize, const ITERATION_COUNT: usize>(
     password: &str,
     salt: [u8; 128],
-) -> [u8; KEYLEN]
+) -> [u8; KEYLEN/8]
 where
     [(); derive_num_blocks(KEYLEN)]:,
     [(); ITERATION_COUNT+1]:,
@@ -25,9 +25,11 @@ where
     for i in 1..derive_num_blocks(KEYLEN) {
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
+
+    dbg!(t);
     
     // Convert to suitable output format TODO: Make this safer
-    let mut out = [0u8; KEYLEN];
+    let mut out = [0u8; KEYLEN/8];
     for i in 0..t.len() {
         dbg!(t.len());
         out[i*(DIGEST_SIZE/8)..i*(DIGEST_SIZE/8)+(DIGEST_SIZE/8)].copy_from_slice(&t[i]);
@@ -44,6 +46,7 @@ fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize
 
     let mut u = hmac_sha256(password, &initial_concat);
     for _ in 1..ITERATION_COUNT {
+        // dbg!(u);
         u = xor_digest_type(u, hmac_sha256(password, &u));
     }
     u

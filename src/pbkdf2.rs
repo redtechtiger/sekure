@@ -20,15 +20,14 @@ where
     }
 
     // Derive the actual cryptographic key
-    let octets_in_last_block = KEYLEN - (derive_num_blocks(KEYLEN) - 1) * DIGEST_SIZE; // Needed?
     let mut t: [DigestType; derive_num_blocks(KEYLEN)] = [[0u8; DIGEST_SIZE / 8]; derive_num_blocks(KEYLEN)];
-    for i in 1..derive_num_blocks(KEYLEN) {
+    for i in 0..derive_num_blocks(KEYLEN) {
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
 
     dbg!(t);
     
-    // Convert to suitable output format TODO: Make this safer
+    // Convert to suitable output format TODO: Make this safer: Currently KEYLEN has to be a factor of DIGEST_SIZE
     let mut out = [0u8; KEYLEN/8];
     for i in 0..t.len() {
         dbg!(t.len());

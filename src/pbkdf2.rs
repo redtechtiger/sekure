@@ -1,7 +1,7 @@
-use sha2::Sha256;
 use hmac::{Hmac, Mac};
-use rand_chacha::ChaCha8Rng;
 use rand::prelude::*;
+use rand_chacha::ChaCha8Rng;
+use sha2::Sha256;
 const DIGEST_SIZE: usize = 256; // SHA256 is used
 type DigestType = [u8; DIGEST_SIZE / 8];
 
@@ -9,10 +9,10 @@ type DigestType = [u8; DIGEST_SIZE / 8];
 pub fn derive_cryptographic_key<const KEYLEN: usize, const ITERATION_COUNT: usize>(
     password: &str,
     salt: [u8; 128],
-) -> [u8; KEYLEN/8]
+) -> [u8; KEYLEN / 8]
 where
     [(); derive_num_blocks(KEYLEN)]:,
-    [(); ITERATION_COUNT+1]:,
+    [(); ITERATION_COUNT + 1]:,
 {
     // Check that values are valid
     if KEYLEN > (2usize.pow(32) - 1) * DIGEST_SIZE {
@@ -20,15 +20,17 @@ where
     }
 
     // Derive the actual cryptographic key
-    let mut t: [DigestType; derive_num_blocks(KEYLEN)] = [[0u8; DIGEST_SIZE / 8]; derive_num_blocks(KEYLEN)];
+    let mut t: [DigestType; derive_num_blocks(KEYLEN)] =
+        [[0u8; DIGEST_SIZE / 8]; derive_num_blocks(KEYLEN)];
     for i in 0..derive_num_blocks(KEYLEN) {
         t[i] = f::<ITERATION_COUNT>(password, salt, i);
     }
 
     // Convert to suitable output format TODO: Make this safer: Currently KEYLEN has to be a factor of DIGEST_SIZE
-    let mut out = [0u8; KEYLEN/8];
+    let mut out = [0u8; KEYLEN / 8];
     for i in 0..t.len() {
-        out[i*(DIGEST_SIZE/8)..i*(DIGEST_SIZE/8)+(DIGEST_SIZE/8)].copy_from_slice(&t[i]);
+        out[i * (DIGEST_SIZE / 8)..i * (DIGEST_SIZE / 8) + (DIGEST_SIZE / 8)]
+            .copy_from_slice(&t[i]);
     }
 
     out
@@ -36,7 +38,7 @@ where
 
 fn f<const ITERATION_COUNT: usize>(password: &str, salt: [u8; 128], index: usize) -> DigestType {
     // Initial hash will be salt with the index concatenated onto it
-    let mut initial_concat = [0u8; 128+4]; // Length of salt plus index (converted to 4 bytes)
+    let mut initial_concat = [0u8; 128 + 4]; // Length of salt plus index (converted to 4 bytes)
     initial_concat[0..128].copy_from_slice(&salt);
     initial_concat[128..].copy_from_slice(&(index as i32).to_be_bytes());
 
@@ -59,8 +61,9 @@ fn xor_digest_type(a: DigestType, b: DigestType) -> DigestType {
     out
 }
 
-fn hmac_sha256(password: &str, input: &[u8]) -> [u8; DIGEST_SIZE/8] {
-    let mut mac = Hmac::<Sha256>::new_from_slice(password.as_bytes()).expect("hmac key initialization failed");
+fn hmac_sha256(password: &str, input: &[u8]) -> [u8; DIGEST_SIZE / 8] {
+    let mut mac = Hmac::<Sha256>::new_from_slice(password.as_bytes())
+        .expect("hmac key initialization failed");
     mac.update(input);
     let result = mac.finalize();
     result.into_bytes().into()
@@ -79,6 +82,14 @@ mod tests {
         for i in 0..128 {
             salt[i] = rng.gen_range(0..=255);
         }
-        dbg!(derive_cryptographic_key::<512, 1000>("foobar1", salt));
+        assert_eq!(
+            derive_cryptographic_key::<512, 1000>("foobar1", salt),
+            [
+                232, 255, 43, 25, 232, 12, 184, 3, 14, 126, 118, 158, 103, 110, 93, 154, 99, 199,
+                212, 112, 141, 64, 28, 152, 125, 70, 93, 187, 31, 252, 74, 87, 246, 244, 56, 48,
+                180, 45, 137, 109, 214, 196, 254, 196, 163, 95, 129, 243, 37, 25, 253, 248, 20, 53,
+                238, 13, 133, 91, 223, 36, 91, 44, 97, 154,
+            ]
+        );
     }
 }

@@ -1,6 +1,7 @@
 use sha2::Sha256;
 use hmac::{Hmac, Mac};
-use sha2::digest::typenum::U256;
+use rand_chacha::ChaCha8Rng;
+use rand::prelude::*;
 const DIGEST_SIZE: usize = 256; // SHA256 is used
 type DigestType = [u8; DIGEST_SIZE / 8];
 
@@ -71,9 +72,16 @@ fn hmac_sha256(password: &str, input: &[u8]) -> [u8; DIGEST_SIZE/8] {
 mod tests {
     use super::*;
 
+    // Temporary test case to observe function behavior
     #[test]
     fn derive_cryptographic_key_1() {
-        // Temporary test case to observe function behavior
-        derive_cryptographic_key::<512, 1000>("foobar", [0; 128]);
+        // "Random" salt that stays constant between tests
+        let mut rng = ChaCha8Rng::seed_from_u64(17);
+        let mut salt: [u8; 128] = [0; 128];
+        for i in 0..128 {
+            salt[i] = rng.gen_range(0..=255);
+        }
+        dbg!(salt);
+        dbg!(derive_cryptographic_key::<512, 1000>("foobar", salt));
     }
 }

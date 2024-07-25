@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn derive_cryptographic_key_2() {
         // Test to check that a very high iteration count doesn't tank performance
-        
+
         // "Random" salt that stays constant between tests
         let mut rng = ChaCha8Rng::seed_from_u64(17);
         let mut salt: [u8; 128] = [0; 128];
@@ -105,7 +105,12 @@ mod tests {
 
         assert_eq!(
             derive_cryptographic_key::<512, 100_010>("my_password_8", salt),
-            [0u8; 64]
+            [
+                74, 237, 188, 63, 30, 178, 153, 229, 105, 180, 209, 208, 185, 205, 19, 55, 254,
+                115, 208, 100, 219, 24, 146, 21, 231, 95, 131, 137, 244, 165, 216, 237, 28, 20, 64,
+                78, 214, 74, 50, 110, 236, 1, 58, 248, 218, 47, 106, 87, 130, 236, 193, 21, 199,
+                45, 105, 18, 132, 15, 28, 234, 14, 179, 52, 93
+            ]
         );
     }
 }

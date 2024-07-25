@@ -83,13 +83,29 @@ mod tests {
             salt[i] = rng.gen_range(0..=255);
         }
         assert_eq!(
-            derive_cryptographic_key::<512, 1000>("foobar1", salt),
+            derive_cryptographic_key::<512, 1_000>("foobar1", salt),
             [
                 232, 255, 43, 25, 232, 12, 184, 3, 14, 126, 118, 158, 103, 110, 93, 154, 99, 199,
                 212, 112, 141, 64, 28, 152, 125, 70, 93, 187, 31, 252, 74, 87, 246, 244, 56, 48,
                 180, 45, 137, 109, 214, 196, 254, 196, 163, 95, 129, 243, 37, 25, 253, 248, 20, 53,
                 238, 13, 133, 91, 223, 36, 91, 44, 97, 154,
             ]
+        );
+    }
+    #[test]
+    fn derive_cryptographic_key_2() {
+        // Test to check that a very high iteration count doesn't tank performance
+        
+        // "Random" salt that stays constant between tests
+        let mut rng = ChaCha8Rng::seed_from_u64(17);
+        let mut salt: [u8; 128] = [0; 128];
+        for i in 0..128 {
+            salt[i] = rng.gen_range(0..=255);
+        }
+
+        assert_eq!(
+            derive_cryptographic_key::<512, 100_010>("my_password_8", salt),
+            [0u8; 64]
         );
     }
 }

@@ -13,4 +13,3 @@ pub trait Tagger {
 pub trait KeyDeriver {
     fn derive_key(password: &str, salt: [u8; 128]) -> [u8; 32];
 }
-

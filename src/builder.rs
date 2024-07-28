@@ -47,6 +47,7 @@ use rand::Rng;
 //     }
 // }
 
+#[derive(Debug)]
 pub struct SekureIO<'a> {
     path: &'a str,
     plaintext_buffer: Vec<u8>,
@@ -64,6 +65,9 @@ impl<'a> SekureIO<'a> {
             master_key,
             salt,
         }
+    }
+    fn write(&mut self, data: &[u8]) {
+        self.plaintext_buffer.extend_from_slice(data);
     }
 }
 
@@ -83,5 +87,6 @@ mod tests {
     fn create_1() {
         // Dummy test to check that sample usage compiles
         let my_file = SekureIO::create("foo.bar", "password");
+        dbg!(my_file);
     }
 }

@@ -1,6 +1,8 @@
 use crate::chacha20;
 use crate::poly1305;
 use crate::pbkdf2;
+use rand::random;
+use rand::Rng;
 
 // /// Trait for encrypting and decrypting data
 // pub trait Encrypter {
@@ -66,7 +68,11 @@ impl<'a> SekureIO<'a> {
 }
 
 fn generate_salt() -> [u8; 128] {
-    todo!();
+    // Generate a random salt
+    let mut salt: [u8; 128] = [0u8; 128];
+    let mut rng = rand::thread_rng();
+    rng.fill(&mut salt);
+    salt
 }
 
 #[cfg(test)]

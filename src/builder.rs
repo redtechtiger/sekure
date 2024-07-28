@@ -3,6 +3,7 @@ use crate::poly1305;
 use crate::pbkdf2;
 use rand::random;
 use rand::Rng;
+use std::fs::File;
 
 // /// Trait for encrypting and decrypting data
 // pub trait Encrypter {
@@ -53,21 +54,27 @@ pub struct SekureIO<'a> {
     plaintext_buffer: Vec<u8>,
     master_key: [u8; 32],
     salt: [u8; 128],
+    file: File,
 }
 
 impl<'a> SekureIO<'a> {
     fn create(path: &'a str, password: &str) -> SekureIO<'a> {
         let salt = generate_salt();
         let master_key = pbkdf2::derive_cryptographic_key::<256, 10_000>(password, salt);
+        let file = File::create(path).expect("Couldn't create file");
         SekureIO {
             path,
             plaintext_buffer: vec![],
             master_key,
             salt,
+            file,
         }
     }
     fn write(&mut self, data: &[u8]) {
         self.plaintext_buffer.extend_from_slice(data);
+    }
+    fn close() {
+        
     }
 }
 

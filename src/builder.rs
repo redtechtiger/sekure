@@ -1,4 +1,5 @@
 use crate::chacha20;
+use crate::poly1305;
 use crate::pbkdf2;
 
 // /// Trait for encrypting and decrypting data
@@ -43,3 +44,9 @@ use crate::pbkdf2;
 //         
 //     }
 // }
+
+pub struct SekureIO<'a> {
+    path: &'a str,
+    password: &'a str,
+    plaintext_buffer: Vec<u8>,
+}

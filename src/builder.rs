@@ -47,6 +47,35 @@ use crate::pbkdf2;
 
 pub struct SekureIO<'a> {
     path: &'a str,
-    password: &'a str,
     plaintext_buffer: Vec<u8>,
+    master_key: [u8; 32],
+    salt: [u8; 128],
+}
+
+impl<'a> SekureIO<'a> {
+    fn create(path: &'a str, password: &str) -> SekureIO<'a> {
+        let salt = generate_salt();
+        let master_key = pbkdf2::derive_cryptographic_key::<256, 10_000>(password, salt);
+        SekureIO {
+            path,
+            plaintext_buffer: vec![],
+            master_key,
+            salt,
+        }
+    }
+}
+
+fn generate_salt() -> [u8; 128] {
+    todo!();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn create_1() {
+        // Dummy test to check that sample usage compiles
+        let my_file = SekureIO::create("foo.bar", "password");
+    }
 }

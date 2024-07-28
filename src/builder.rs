@@ -3,6 +3,7 @@ use crate::poly1305;
 use crate::pbkdf2;
 use rand::random;
 use rand::Rng;
+use std::io::Write;
 use std::fs::File;
 
 // /// Trait for encrypting and decrypting data
@@ -73,8 +74,15 @@ impl<'a> SekureIO<'a> {
     fn write(&mut self, data: &[u8]) {
         self.plaintext_buffer.extend_from_slice(data);
     }
-    fn close() {
-        
+    fn close(mut self) {
+        let ciphertext = chacha20::cipher_xor(
+            self.plaintext_buffer.as_slice(),
+            /* key */
+            /* nonce */
+            0,
+        );
+        self.file.write_all(&ciphertext);
+        todo!();
     }
 }
 

@@ -75,13 +75,23 @@ impl<'a> SekureIO<'a> {
         self.plaintext_buffer.extend_from_slice(data);
     }
     fn close(mut self) {
-        let ciphertext = chacha20::cipher_xor(
-            self.plaintext_buffer.as_slice(),
-            /* key */
-            /* nonce */
-            0,
-        );
-        self.file.write_all(&ciphertext);
+        //
+        // *** Most of this will be abstracted away into an aead module! ***
+        //
+        // Convert master key to 8 x u32
+        // let key = [0u32; 8];
+        // for i in 0..key.len() {
+        //     key[i] = u32::from_le_bytes(self.master_key[i..i*4+4].try_into().unwrap());
+        // }
+        // 
+        // let ciphertext = todo!();
+        // let ciphertext = chacha20::cipher_xor(
+        //     self.plaintext_buffer.as_slice(),
+        //     key,
+        //     nonce,
+        //     0,
+        // );
+        // self.file.write_all(&ciphertext);
         todo!();
     }
 }
